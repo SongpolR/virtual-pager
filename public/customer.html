@@ -4,29 +4,33 @@
     <meta charset="UTF-8">
     <title>Order Status</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        body { font-family: sans-serif; text-align: center; padding: 60px; }
         #status { font-size: 1.5em; margin-top: 40px; }
     </style>
 </head>
 <body>
 <h2>☕ My Shop</h2>
 <div id="status">Preparing your order...</div>
-<audio id="ding" src="ding.wav"></audio>
+<audio id="ding" src="ding.wav" loop></audio>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    const url = new URL(window.location.href);
-    const orderNo = url.searchParams.get('no');
-    document.title = "Order #" + orderNo;
-
+    const orderNo = new URL(location.href).searchParams.get('no');
+    document.title = `Order #${orderNo}`;
+    const statusEl = document.getElementById('status');
+    const ding = document.getElementById('ding');
     const socket = io();
 
     socket.on('order-status', data => {
-        if (data.orderNo === orderNo && data.status === 'READY') {
-            document.getElementById('status').textContent = `✅ Order #${orderNo} is ready!`;
-            const audio = document.getElementById('ding');
-            audio.play();
-            navigator.vibrate?.([200, 100, 200]);
+        if (data.orderNo !== orderNo) return;
+        if (data.status === 'READY') {
+            statusEl.textContent = `✅ Order #${orderNo} is ready!`;
+            ding.play();
+            navigator.vibrate?.([300, 150, 300, 150, 300]);
+        } else if (data.status === 'DONE') {
+            statusEl.textContent = `🧾 Order #${orderNo} collected. Thank you!`;
+            ding.pause();
+            ding.currentTime = 0;
         }
     });
 </script>

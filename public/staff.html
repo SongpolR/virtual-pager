@@ -4,19 +4,15 @@
     <meta charset="UTF-8">
     <title>Staff Dashboard</title>
     <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-        }
-
-        button {
-            padding: 6px 10px;
-            margin-left: 10px;
-        }
+        body { font-family: sans-serif; padding: 20px; }
+        .order { margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
+        button { padding: 6px 10px; margin: 4px; cursor: pointer; }
+        canvas { display: block; margin-top: 8px; }
     </style>
+    <script src="qr.min.js"></script>
 </head>
 <body>
-<h2>🧑‍🍳 My Shop - Staff Pager Dashboard</h2>
+<h2>🧑‍🍳 My Shop – Staff Pager Dashboard</h2>
 <button id="newOrder">➕ Add new order</button>
 <div id="orders"></div>
 
@@ -26,22 +22,37 @@
         const data = await res.json();
         const box = document.getElementById('orders');
         box.innerHTML = data.map(o => `
-        <div>
-          <b>Order #${o.orderNo}</b> – ${o.status}
-          <button onclick="notify('${o.orderNo}')">Notify</button>
+        <div class="order" id="order-${o.orderNo}">
+          <b>Order #${o.orderNo}</b> – <span>${o.status}</span><br/>
           <a href="/customer.html?no=${o.orderNo}" target="_blank">[Customer link]</a>
+          <button onclick="notify('${o.orderNo}')">🔔 Notify</button>
+          <button onclick="done('${o.orderNo}')">✅ Done</button>
+          <div id="qr-${o.orderNo}"></div>
         </div>
       `).join('');
+
+        data.forEach(o => {
+            const url = window.location.origin + '/customer.html?no=' + o.orderNo;
+            const qrDiv = document.getElementById('qr-' + o.orderNo);
+            qrDiv.innerHTML = "";
+            new QRCode(qrDiv, { text: url, width: 100, height: 100 });
+        });
     }
 
     async function notify(no) {
-        await fetch(`/api/orders/${no}/ready`, {method: 'POST'});
+        await fetch(`/api/orders/${no}/ready`, { method: 'POST' });
         alert(`Order #${no} notified`);
         loadOrders();
     }
 
+    async function done(no) {
+        await fetch(`/api/orders/${no}/done`, { method: 'POST' });
+        alert(`Order #${no} marked done`);
+        loadOrders();
+    }
+
     document.getElementById('newOrder').onclick = async () => {
-        await fetch('/api/order', {method: 'POST'});
+        await fetch('/api/order', { method: 'POST' });
         loadOrders();
     };
 

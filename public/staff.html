@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Dashboard</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        button {
+            padding: 6px 10px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<h2>🧑‍🍳 My Shop - Staff Pager Dashboard</h2>
+<button id="newOrder">➕ Add new order</button>
+<div id="orders"></div>
+
+<script>
+    async function loadOrders() {
+        const res = await fetch('/api/orders');
+        const data = await res.json();
+        const box = document.getElementById('orders');
+        box.innerHTML = data.map(o => `
+        <div>
+          <b>Order #${o.orderNo}</b> – ${o.status}
+          <button onclick="notify('${o.orderNo}')">Notify</button>
+          <a href="/customer.html?no=${o.orderNo}" target="_blank">[Customer link]</a>
+        </div>
+      `).join('');
+    }
+
+    async function notify(no) {
+        await fetch(`/api/orders/${no}/ready`, {method: 'POST'});
+        alert(`Order #${no} notified`);
+        loadOrders();
+    }
+
+    document.getElementById('newOrder').onclick = async () => {
+        await fetch('/api/order', {method: 'POST'});
+        loadOrders();
+    };
+
+    loadOrders();
+</script>
+</body>
+</html>

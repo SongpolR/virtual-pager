@@ -104,8 +104,15 @@ export default function Signup() {
 
     const res = await fetch(`${API}/auth/signup`, { method: "POST", body: fd });
     if (!res.ok) {
-      const text = await res.text();
-      setSubmitErr(text || "Signup failed");
+      const data = await res.json().catch(() => ({}));
+      if (Array.isArray(data.errors)) {
+        const msgs = data.errors.map(
+          (code) => t(`errors.${code}`) // lookup numeric key
+        );
+        setSubmitErr(msgs.join(", "));
+      } else {
+        setSubmitErr(data.message || "Unknown error");
+      }
       return;
     }
     const data = await res.json();

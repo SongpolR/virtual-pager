@@ -36,6 +36,17 @@ const resources = {
       logo_too_big: "Logo must be ≤ 2 MB",
       logo_too_large_resolution: "Logo must be ≤ 1024×1024 px",
 
+      errors: {
+        1000: "This field is required.",
+        1001: "The format is invalid.",
+        1002: "This email is already registered.",
+        1003: "Invalid email or password.",
+        1004: "Unauthorized request.",
+        1005: "File is too large.",
+        1006: "Image resolution is too high.",
+        1999: "An unexpected error occurred.",
+      },
+
       // Misc
       or_signin: "Or sign in",
     },
@@ -71,6 +82,17 @@ const resources = {
       invalid_image_file: "ไฟล์รูปภาพไม่ถูกต้อง",
       logo_too_big: "โลโก้ต้องมีขนาด ≤ 2 MB",
       logo_too_large_resolution: "โลโก้ต้องมีความละเอียด ≤ 1024×1024 พิกเซล",
+
+      errors: {
+        1000: "จำเป็นต้องกรอกข้อมูล",
+        1001: "รูปแบบข้อมูลไม่ถูกต้อง",
+        1002: "อีเมลนี้ถูกใช้งานแล้ว",
+        1003: "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+        1004: "ไม่มีสิทธิ์เข้าถึง",
+        1005: "ไฟล์มีขนาดใหญ่เกินไป",
+        1006: "ความละเอียดของรูปภาพสูงเกินไป",
+        1999: "เกิดข้อผิดพลาดที่ไม่คาดคิด",
+      },
 
       or_signin: "หรือ เข้าสู่ระบบ",
     },

@@ -20,6 +20,14 @@ Route::post('/auth/password',[AuthController::class, 'changePassword'])->middlew
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect']);
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
+// email verification
+Route::get('/auth/verify-email', [AuthController::class,'verifyEmail'])->name('auth.verify-email');
+Route::post('/auth/resend-verification', [AuthController::class,'resendVerification']);
+
+// forgot/reset password
+Route::post('/auth/forgot', [AuthController::class,'forgot']);
+Route::post('/auth/reset',  [AuthController::class,'reset']);
+
 // owner-protected shop updates
 Route::middleware('owner')->group(function () {
   Route::put('/shop',       [ShopController::class, 'update']);

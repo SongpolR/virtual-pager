@@ -9,6 +9,8 @@ import "./index.css";
 import "./i18n";
 import Signup from "./pages/Signup.jsx";
 import Login from "./pages/Login.jsx";
+import VerifyEmail from "./pages/VerifyEmail.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 const RequireAuth = ({ children }) => {
   const t = localStorage.getItem("token");
@@ -34,6 +36,8 @@ const router = createBrowserRouter([
       </RequireAuth>
     ),
   },
+  { path: "/verify-email", element: <VerifyEmail /> },
+  { path: "/reset-password", element: <ResetPassword /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

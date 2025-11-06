@@ -41,6 +41,7 @@ class GoogleAuthController extends Controller
                 'name' => $name,
                 'email' => $email,
                 'password' => null, // using Google
+                'email_verified_at'=>now(), // 👈 mark verified 
                 'created_at'=>now(),'updated_at'=>now(),
             ]);
 
@@ -56,6 +57,9 @@ class GoogleAuthController extends Controller
             ]);
 
             $owner = DB::table('owners')->where('id',$ownerId)->first();
+        }else if (!$owner->email_verified_at) {
+            DB::table('owners')->where('id', $owner->id)->update(['email_verified_at'=>now()]);
+            $owner = DB::table('owners')->where('id',$owner->id)->first();
         }
 
         // Issue token

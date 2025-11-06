@@ -36,6 +36,23 @@ const resources = {
       logo_too_big: "Logo must be ≤ 2 MB",
       logo_too_large_resolution: "Logo must be ≤ 1024×1024 px",
       sign_in_google: "Sign in with Google",
+      verify_email_title: "Verify your email",
+      verify_email_desc:
+        "We’ve sent a verification link to your email. If you didn’t get it, you can resend it below.",
+      email_address: "Email address",
+      resend_link: "Resend verification link",
+      link_sent:
+        "If an account exists for this email, we have sent a new verification link.",
+      open_email_app: "Open email app",
+      back_to_login: "Back to Login",
+      verify_now: "Verify now",
+      login_error_unverified: "Please verify your email to continue.",
+      login_error_bad_password: "Incorrect password.",
+      login_error_no_account: "We couldn't find an account with that email.",
+      // links:
+      verify_now: "Verify now",
+      reset_password: "Reset password",
+      create_account: "Create account",
 
       errors: {
         1000: "This field is required.",
@@ -45,9 +62,13 @@ const resources = {
         1004: "Unauthorized request.",
         1005: "File is too large.",
         1006: "Image resolution is too high.",
-        1999: "An unexpected error occurred.",
         1100: "Google sign-in failed.",
         1101: "Google did not provide an email for this account.",
+        1200: "Please verify your email to continue.",
+        1201: "If an account exists for this email, we have sent a reset link.",
+        1202: "This reset link is invalid.",
+        1203: "This reset link has expired.",
+        1999: "An unexpected error occurred.",
       },
 
       // Misc
@@ -86,6 +107,21 @@ const resources = {
       logo_too_big: "โลโก้ต้องมีขนาด ≤ 2 MB",
       logo_too_large_resolution: "โลโก้ต้องมีความละเอียด ≤ 1024×1024 พิกเซล",
       sign_in_google: "เข้าสู่ระบบด้วย Google",
+      verify_email_title: "ยืนยันอีเมลของคุณ",
+      verify_email_desc:
+        "เราได้ส่งลิงก์ยืนยันไปยังอีเมลของคุณ หากยังไม่ได้รับ คุณสามารถส่งอีกครั้งได้ด้านล่าง",
+      email_address: "อีเมล",
+      resend_link: "ส่งลิงก์ยืนยันอีกครั้ง",
+      link_sent: "ถ้ามีบัญชีนี้อยู่ เราได้ส่งลิงก์ยืนยันใหม่ให้แล้ว",
+      open_email_app: "เปิดแอปอีเมล",
+      back_to_login: "กลับสู่หน้าเข้าสู่ระบบ",
+      verify_now: "ยืนยันตอนนี้",
+      login_error_unverified: "กรุณายืนยันอีเมลก่อนจึงจะใช้งานต่อได้",
+      login_error_bad_password: "รหัสผ่านไม่ถูกต้อง",
+      login_error_no_account: "ไม่พบบัญชีที่ใช้อีเมลนี้",
+      verify_now: "ยืนยันตอนนี้",
+      reset_password: "รีเซ็ตรหัสผ่าน",
+      create_account: "สร้างบัญชี",
 
       errors: {
         1000: "จำเป็นต้องกรอกข้อมูล",
@@ -95,9 +131,13 @@ const resources = {
         1004: "ไม่มีสิทธิ์เข้าถึง",
         1005: "ไฟล์มีขนาดใหญ่เกินไป",
         1006: "ความละเอียดของรูปภาพสูงเกินไป",
-        1999: "เกิดข้อผิดพลาดที่ไม่คาดคิด",
         1100: "ไม่สามารถเข้าสู่ระบบด้วย Google ได้",
         1101: "บัญชี Google นี้ไม่มีอีเมลแนบมา",
+        1200: "กรุณายืนยันอีเมลก่อนใช้งานต่อ",
+        1201: "ถ้ามีบัญชีอีเมลนี้ เราได้ส่งลิงก์รีเซ็ตรหัสผ่านให้แล้ว",
+        1202: "ลิงก์รีเซ็ตรหัสผ่านไม่ถูกต้อง",
+        1203: "ลิงก์รีเซ็ตรหัสผ่านหมดอายุ",
+        1999: "เกิดข้อผิดพลาดที่ไม่คาดคิด",
       },
 
       or_signin: "หรือ",

@@ -1,59 +1,35 @@
-import React, { useEffect } from "react";
+// Login.jsx
+import React from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
-import GoogleIcon from "../components/icons/GoogleIcon.jsx";
-
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
 export default function Login() {
   const { t } = useTranslation();
-
-  useEffect(() => {
-    const handler = (ev) => {
-      if (ev.data?.type === "google-auth-result") {
-        const { payload } = ev.data;
-        if (payload?.token) {
-          localStorage.setItem("token", payload.token);
-          location.href = "/";
-        } else if (payload?.errors) {
-          alert(payload.errors.map((code) => t(`errors.${code}`)).join("\n"));
-        } else {
-          alert(t("errors.1999"));
-        }
-      }
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, [t]);
-
-  const loginGoogle = () => {
-    // open popup to backend redirect endpoint
-    window.open(
-      `${API}/auth/google/redirect`,
-      "google",
-      "width=520,height=640"
-    );
-  };
+  const [errBlock, setErrBlock] = React.useState(null); // { code, email }
 
   const submit = async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
+    setErrBlock(null);
+
+    const email = e.target.email.value.trim();
     const password = e.target.password.value;
+
     const r = await fetch(`${API}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
+
     if (!r.ok) {
       const data = await r
         .json()
         .catch(() => ({ message: "", errors: [1999] }));
-      alert(
-        (data.errors || []).map((code) => t(`errors.${code}`)).join("\n") ||
-          t("errors.1999")
-      );
+      const code = Array.isArray(data.errors) ? data.errors[0] : 1999;
+      setErrBlock({ code, email });
       return;
     }
+
     const { token } = await r.json();
     localStorage.setItem("token", token);
     location.href = "/";
@@ -65,6 +41,10 @@ export default function Login() {
       <div className="min-h-screen flex items-center justify-center">
         <form onSubmit={submit} className="bg-white p-6 rounded-xl shadow w-80">
           <h1 className="text-xl font-semibold">{t("login")}</h1>
+
+          {/* Inline error panel */}
+          {errBlock && <LoginErrorPanel {...errBlock} t={t} />}
+
           <input
             name="email"
             type="email"
@@ -83,20 +63,9 @@ export default function Login() {
             {t("login")}
           </button>
 
-          <div className="mt-4 text-center">
-            <button
-              type="button"
-              onClick={loginGoogle}
-              className="flex items-center justify-center w-full gap-2 border border-gray-300 rounded py-2 hover:bg-gray-50 transition-colors"
-            >
-              <GoogleIcon size={18} />
-              <span>{t("sign_in_google")}</span>
-            </button>
-          </div>
-
           <div className="mt-4 text-center text-sm">
             {t("create_account")}?{" "}
-            <a className="text-blue-600 underline" href="/signup">
+            <a className="text-blue-600 underline" href={`/signup`}>
               {t("signup")}
             </a>
           </div>
@@ -104,4 +73,57 @@ export default function Login() {
       </div>
     </div>
   );
+}
+
+function LoginErrorPanel({ code, email, t }) {
+  const wrap = (node) => (
+    <div className="mt-3 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+      {node}
+    </div>
+  );
+
+  if (code === 1200) {
+    // email not verified
+    return wrap(
+      <>
+        {t("login_error_unverified")}{" "}
+        <a
+          className="underline"
+          href={`/verify-email?email=${encodeURIComponent(email)}`}
+        >
+          {t("verify_now")}
+        </a>
+      </>
+    );
+  }
+  if (code === 1003) {
+    // incorrect password
+    return wrap(
+      <>
+        {t("login_error_bad_password")}{" "}
+        <a
+          className="underline"
+          href={`/reset-password?email=${encodeURIComponent(email)}`}
+        >
+          {t("reset_password")}
+        </a>
+      </>
+    );
+  }
+  if (code === 1007) {
+    // account not found
+    return wrap(
+      <>
+        {t("login_error_no_account")}{" "}
+        <a
+          className="underline"
+          href={`/signup?email=${encodeURIComponent(email)}`}
+        >
+          {t("create_account")}
+        </a>
+      </>
+    );
+  }
+  // fallback
+  return wrap(t("errors.1999"));
 }

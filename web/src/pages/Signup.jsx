@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
+// import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import GoogleIcon from "../components/icons/GoogleIcon.jsx";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
@@ -145,12 +145,12 @@ export default function Signup() {
     }
     const data = await res.json();
     localStorage.setItem("token", data.token);
-    location.href = "/";
+    location.href = "/login";
   };
 
   return (
     <div className="min-h-screen relative">
-      <LanguageSwitcher className="fixed top-4 right-4" />
+      {/* <LanguageSwitcher className="fixed top-4 right-4" /> */}
       <div className="min-h-screen flex items-center justify-center">
         <form
           onSubmit={submit}

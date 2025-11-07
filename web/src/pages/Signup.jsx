@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-// import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import GoogleIcon from "../components/icons/GoogleIcon.jsx";
+import ChecklistItem from "../components/ChecklistItem.jsx";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
@@ -12,10 +12,13 @@ const MAX_H = 1024;
 
 export default function Signup() {
   const { t } = useTranslation();
+  const params = new URLSearchParams(location.search);
+  const initialEmail = params.get("email") || "";
   const [form, setForm] = useState({
     name: "",
-    email: "",
+    email: initialEmail,
     password: "",
+    password_confirmation: "",
     shop_name: "",
   });
   const [logo, setLogo] = useState(null);
@@ -34,6 +37,10 @@ export default function Signup() {
     }),
     [pw]
   );
+  const pwMatch =
+    form.password &&
+    form.password_confirmation &&
+    form.password === form.password_confirmation;
   const allPwOk =
     pw &&
     pwChecks.length &&
@@ -82,6 +89,7 @@ export default function Signup() {
 
   const validateBeforeSubmit = () => {
     if (!allPwOk) return t("password_requirements_title");
+    if (!pwMatch) return t("confirm_password"); // simple hint
     if (logoMeta.error) return logoMeta.error;
     return "";
   };
@@ -127,6 +135,7 @@ export default function Signup() {
     fd.append("name", form.name);
     fd.append("email", form.email);
     fd.append("password", form.password);
+    fd.append("password_confirmation", form.password_confirmation);
     fd.append("shop_name", form.shop_name);
     if (logo) fd.append("logo", logo);
 
@@ -150,7 +159,6 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen relative">
-      {/* <LanguageSwitcher className="fixed top-4 right-4" /> */}
       <div className="min-h-screen flex items-center justify-center">
         <form
           onSubmit={submit}
@@ -233,6 +241,18 @@ export default function Signup() {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
 
+          {/* Password confirmation */}
+          <label className="block mt-4 text-sm">{t("confirm_password")}</label>
+          <input
+            type="password"
+            className="border p-2 rounded w-full"
+            required
+            value={form.password_confirmation}
+            onChange={(e) =>
+              setForm({ ...form, password_confirmation: e.target.value })
+            }
+          />
+
           <div className="mt-2">
             <div className="text-xs text-gray-500 font-medium">
               {t("password_requirements_title")}
@@ -242,6 +262,7 @@ export default function Signup() {
               <ChecklistItem ok={pwChecks.upper} label={t("pw_req_upper")} />
               <ChecklistItem ok={pwChecks.number} label={t("pw_req_number")} />
               <ChecklistItem ok={pwChecks.allowed} label={t("pw_req_chars")} />
+              <ChecklistItem ok={pwMatch} label={t("pw_req_match")} />
             </ul>
           </div>
 
@@ -258,6 +279,7 @@ export default function Signup() {
               !form.name ||
               !form.email ||
               !allPwOk ||
+              !pwMatch ||
               !!logoMeta.error
             }
           >
@@ -283,18 +305,5 @@ export default function Signup() {
         </form>
       </div>
     </div>
-  );
-}
-
-function ChecklistItem({ ok, label }) {
-  return (
-    <li
-      className={`flex items-start gap-2 ${
-        ok ? "text-green-700" : "text-gray-600"
-      }`}
-    >
-      <span className="mt-[2px]">{ok ? "✅" : "⏺️"}</span>
-      <span>{label}</span>
-    </li>
   );
 }

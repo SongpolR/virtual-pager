@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'owner' => \App\Http\Middleware\OwnerTokenAuth::class,
             'verified'=> \App\Http\Middleware\OwnerVerified::class,
+            'staff'    => \App\Http\Middleware\StaffTokenAuth::class,
+            'any'      => \App\Http\Middleware\AnyTokenAuth::class, // owner OR staff
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

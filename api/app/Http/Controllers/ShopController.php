@@ -22,6 +22,9 @@ class ShopController extends Controller
       'random_min' => 'sometimes|integer|min:1',
       'random_max' => 'sometimes|integer|min:1|gte:random_min',
       'sound_key' => ['sometimes', Rule::in(['ding','bell','chime','ping','beep'])],
+      'seq_start' => 'sometimes|integer|min:1',
+      'seq_reset_policy' => ['sometimes', Rule::in(['NONE','DAILY'])],
+      'timezone' => 'sometimes|string|max:64',
     ]);
 
     DB::table('shops')->where('id',1)->update(array_merge(

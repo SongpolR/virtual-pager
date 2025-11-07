@@ -14,7 +14,7 @@ class GoogleAuthController extends Controller
         // stateless popup-friendly
         return Socialite::driver('google')
             ->stateless()
-            ->scopes(['openid','profile','email'])
+            ->scopes(['openid', 'profile', 'email'])
             ->redirect();
     }
 
@@ -41,33 +41,37 @@ class GoogleAuthController extends Controller
                 'name' => $name,
                 'email' => $email,
                 'password' => null, // using Google
-                'email_verified_at'=>now(), // 👈 mark verified 
-                'created_at'=>now(),'updated_at'=>now(),
+                'email_verified_at' => now(), // 👈 mark verified 
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
             DB::table('shops')->insert([
-                'owner_id'=>$ownerId,
-                'name'=>'My Cafe',
-                'logo_url'=>null,
-                'order_mode'=>'SEQUENTIAL',
-                'seq_next'=>1,
-                'random_min'=>100,'random_max'=>999,
-                'sound_key'=>'ding',
-                'created_at'=>now(),'updated_at'=>now(),
+                'owner_id' => $ownerId,
+                'name' => 'My Cafe',
+                'logo_url' => null,
+                'order_mode' => 'SEQUENTIAL',
+                'seq_next' => 1,
+                'random_min' => 100,
+                'random_max' => 999,
+                'sound_key' => 'ding',
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
-            $owner = DB::table('owners')->where('id',$ownerId)->first();
-        }else if (!$owner->email_verified_at) {
-            DB::table('owners')->where('id', $owner->id)->update(['email_verified_at'=>now()]);
-            $owner = DB::table('owners')->where('id',$owner->id)->first();
+            $owner = DB::table('owners')->where('id', $ownerId)->first();
+        } else if (!$owner->email_verified_at) {
+            DB::table('owners')->where('id', $owner->id)->update(['email_verified_at' => now()]);
+            $owner = DB::table('owners')->where('id', $owner->id)->first();
         }
 
         // Issue token
         $token = Str::random(64);
         DB::table('owner_api_tokens')->insert([
-            'owner_id'=>$owner->id,
-            'token'=>$token,
-            'created_at'=>now(),'updated_at'=>now(),
+            'owner_id' => $owner->id,
+            'token' => $token,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         // Return a minimal HTML that postMessages the token to opener and closes

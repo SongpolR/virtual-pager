@@ -1,24 +1,48 @@
 <?php
+
 return [
-  // Signup
-  'REQUIRED_FIELD'     => 1000,
-  'INVALID_FORMAT'     => 1001,
-  'EMAIL_TAKEN'        => 1002,
-  'INVALID_CREDENTIAL' => 1003,
-  'UNAUTHORIZED'       => 1004,
-  'FILE_TOO_LARGE'     => 1005,
-  'IMAGE_TOO_LARGE'    => 1006,
-  'ACCOUNT_NOT_FOUND'  => 1007,
-  
-  // Login
-  'OAUTH_FAILED'       => 1100,
-  'OAUTH_NO_EMAIL'     => 1101,
 
-  // Email
-  'EMAIL_NOT_VERIFIED' => 1200,
-  'RESET_EMAIL_SENT'   => 1201, // (not an error—useful for message mapping if desired)
-  'RESET_TOKEN_INVALID'=> 1202,
-  'RESET_TOKEN_EXPIRED'=> 1203,
+    /*
+    |--------------------------------------------------------------------------
+    | Standardized API Error Codes
+    |--------------------------------------------------------------------------
+    | Each error is a unique integer to make frontend mapping simple.
+    | All controllers should return JSON like:
+    | {
+    |   "message": "error message",
+    |   "errors": [1003]
+    | }
+    | The frontend will map these to localized i18n messages.
+    |--------------------------------------------------------------------------
+    */
 
-  'UNKNOWN'            => 1999,
+    // ----- General -----
+    'UNKNOWN'             => 1999,
+    'VALIDATION_ERROR'    => 1000,
+    'INVALID_FORMAT'      => 1001,
+    'EMAIL_EXISTS'        => 1002,
+    'INVALID_CREDENTIAL'  => 1003,
+    'UNAUTHORIZED'        => 1004,
+    'FILE_TOO_LARGE'      => 1005,
+    'IMAGE_TOO_LARGE'     => 1006,
+    'ACCOUNT_NOT_FOUND'   => 1007,
+
+    // ----- Google Login -----
+    'GOOGLE_FAILED'       => 1100,
+    'GOOGLE_NO_EMAIL'     => 1101,
+
+    // ----- Email Verification / Reset -----
+    'EMAIL_NOT_VERIFIED'  => 1200,
+    'RESET_SENT'          => 1201,
+    'RESET_INVALID'       => 1202,
+    'RESET_EXPIRED'       => 1203,
+
+    // ----- Staff-specific -----
+    'STAFF_INACTIVE'      => 1300,
+
+    // ----- Staff Invite -----
+    'INVITE_INVALID'      => 1400,
+    'INVITE_EXPIRED'      => 1401,
+    'INVITE_USED'         => 1402,
+    'INVITE_PENDING'      => 1403
 ];

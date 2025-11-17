@@ -19,18 +19,18 @@ class ShopController extends Controller
   {
     $req->validate([
       'name' => 'sometimes|string|max:120',
-      'order_mode' => ['sometimes', Rule::in(['SEQUENTIAL', 'RANDOM'])],
+      'order_numbering_mode' => ['sometimes', Rule::in(['sequential', 'random'])],
       'seq_next' => 'sometimes|integer|min:1',
       'random_min' => 'sometimes|integer|min:1',
       'random_max' => 'sometimes|integer|min:1|gte:random_min',
       'sound_key' => ['sometimes', Rule::in(['ding', 'bell', 'chime', 'ping', 'beep'])],
       'seq_start' => 'sometimes|integer|min:1',
-      'seq_reset_policy' => ['sometimes', Rule::in(['NONE', 'DAILY'])],
+      'seq_reset_policy' => ['sometimes', Rule::in(['none', 'daily'])],
       'timezone' => 'sometimes|string|max:64',
     ]);
 
     DB::table('shops')->where('id', 1)->update(array_merge(
-      $req->only(['name', 'order_mode', 'seq_next', 'random_min', 'random_max', 'sound_key']),
+      $req->only(['name', 'order_numbering_mode', 'seq_next', 'random_min', 'random_max', 'sound_key']),
       ['updated_at' => now()]
     ));
 

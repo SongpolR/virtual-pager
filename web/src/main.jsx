@@ -20,6 +20,8 @@ import ShopSettings from "./pages/ShopSettings.jsx";
 import AccountSettings from "./pages/AccountSettings.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
+import LanguageSwitcher from "./components/LanguageSwitcher.jsx";
+
 // ---------- i18n ----------
 import { useTranslation } from "react-i18next";
 
@@ -69,6 +71,8 @@ function TopNav({ role }) {
           >
             Account
           </a>
+
+          <LanguageSwitcher />
         </nav>
       </div>
     </header>
@@ -87,7 +91,6 @@ function Protected({ children, role }) {
 
   return (
     <div className="relative min-h-screen bg-gray-50">
-      <LangSwitcher />
       <TopNav role={tokenType} />
       <main className="mx-auto max-w-5xl px-4 pb-8">{children}</main>
     </div>

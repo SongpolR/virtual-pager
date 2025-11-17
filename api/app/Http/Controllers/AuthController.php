@@ -61,7 +61,7 @@ class AuthController extends Controller
           'owner_id' => $ownerId,
           'name' => $req->shop_name,
           'logo_url' => $logoUrl,
-          'order_mode' => 'SEQUENTIAL',
+          'order_numbering_mode' => 'sequential',
           'seq_next' => 1,
           'random_min' => 100,
           'random_max' => 999,

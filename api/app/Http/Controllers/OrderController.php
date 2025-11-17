@@ -20,7 +20,7 @@ class OrderController extends Controller
         $today = now()->timezone(config('app.timezone', 'UTC'))->toDateString();
 
         $q = Order::where('shop_id', $shopId)
-            ->where('order_date', $today)
+            ->whereDate('order_date', $today)
             ->orderBy('created_at', 'asc');
 
         if ($status) {
@@ -55,20 +55,21 @@ class OrderController extends Controller
         $actorType  = $req->attributes->get('actor_type'); // 'owner' | 'staff' (if you set this)
         $actorId    = $req->attributes->get('actor_id');
 
+        // Use app timezone, we care about the date portion for daily reset
         $today = now()->timezone(config('app.timezone', 'UTC'))->toDateString();
 
         // Basic validation for incoming data
         $data = $req->validate([
-            'order_no' => ['nullable', 'string', 'max:50'],
-            'pos_ref'  => ['nullable', 'string', 'max:100'],
-            'items'    => ['nullable', 'array', 'max:50'], // max 50 line items
-            'items.*.name'  => ['nullable', 'string', 'max:255'],
-            'items.*.qty'   => ['nullable', 'numeric'],
-            'items.*.note'  => ['nullable', 'string', 'max:255'],
+            'order_no'       => ['nullable', 'string', 'max:50'],
+            'pos_ref'        => ['nullable', 'string', 'max:100'],
+            'items'          => ['nullable', 'array', 'max:50'], // max 50 line items
+            'items.*.name'   => ['nullable', 'string', 'max:255'],
+            'items.*.qty'    => ['nullable', 'numeric'],
+            'items.*.note'   => ['nullable', 'string', 'max:255'],
             // you can extend with price, sku, etc. later
         ]);
 
-        // Load shop to know numbering mode
+        // Load shop (we still verify shop exists, even if we no longer use numbering_mode)
         $shop = DB::table('shops')->where('id', $shopId)->first();
         if (!$shop) {
             return response()->json([
@@ -77,19 +78,18 @@ class OrderController extends Controller
             ], 404);
         }
 
-        $mode = $shop->order_numbering_mode ?? 'sequential';
-
         try {
-            $order = DB::transaction(function () use ($shopId, $today, $mode, $actorType, $actorId, $data) {
+            $order = DB::transaction(function () use ($shopId, $today, $actorType, $actorId, $data) {
                 $providedOrderNo = isset($data['order_no']) && $data['order_no'] !== ''
                     ? trim($data['order_no'])
                     : null;
 
-                // Decide final order_no:
+
+                // 1) If order_no provided (e.g. from POS or manual override),
+                //    we just enforce uniqueness for (shop_id + date).
                 if ($providedOrderNo !== null) {
-                    // Ensure no collision: same shop + date + order_no
                     $exists = Order::where('shop_id', $shopId)
-                        ->where('order_date', $today)
+                        ->whereDate('order_date', $today)
                         ->where('order_no', $providedOrderNo)
                         ->exists();
 
@@ -99,23 +99,23 @@ class OrderController extends Controller
 
                     $orderNo = $providedOrderNo;
                 } else {
-                    // Auto-generate
-                    $orderNo = $this->generateOrderNo($shopId, $today, $mode);
+                    // 2) No order_no provided → generate daily sequential 3-digit 001–999
+                    $orderNo = $this->generateOrderNo($shopId, $today);
                 }
 
                 $now = now();
 
                 $order = Order::create([
-                    'shop_id'        => $shopId,
-                    'order_date'     => $today,
-                    'order_no'       => $orderNo,
-                    'status'         => 'pending',
-                    'items'          => $data['items'] ?? null,
-                    'pos_ref'        => $data['pos_ref'] ?? null,
+                    'shop_id'         => $shopId,
+                    'order_date'      => $today,          // date portion; can be cast to datetime by Eloquent
+                    'order_no'        => $orderNo,
+                    'status'          => 'pending',
+                    'items'           => $data['items'] ?? null,
+                    'pos_ref'         => $data['pos_ref'] ?? null,
                     'created_by_type' => $actorType,
-                    'created_by_id'  => $actorId,
-                    'created_at'     => $now,
-                    'updated_at'     => $now,
+                    'created_by_id'   => $actorId,
+                    'created_at'      => $now,
+                    'updated_at'      => $now,
                 ]);
 
                 return $order;
@@ -124,6 +124,13 @@ class OrderController extends Controller
             if ($e->getMessage() === 'ORDER_NO_CONFLICT') {
                 return response()->json([
                     'message' => 'Order number already exists for today.',
+                    'errors'  => [config('errorcodes.ORDER_NUMBERING_FAILED')],
+                ], 422);
+            }
+
+            if ($e->getMessage() === 'ORDER_NO_OVERFLOW') {
+                return response()->json([
+                    'message' => 'Maximum number of orders reached for today.',
                     'errors'  => [config('errorcodes.ORDER_NUMBERING_FAILED')],
                 ], 422);
             }
@@ -140,11 +147,11 @@ class OrderController extends Controller
         }
 
         return response()->json([
-            'id'        => $order->id,
-            'order_no'  => $order->order_no,
-            'status'    => $order->status,
-            'items'     => $order->items,
-            'pos_ref'   => $order->pos_ref,
+            'id'         => $order->id,
+            'order_no'   => $order->order_no,
+            'status'     => $order->status,
+            'items'      => $order->items,
+            'pos_ref'    => $order->pos_ref,
             'created_at' => $order->created_at,
         ], 201);
     }
@@ -222,33 +229,25 @@ class OrderController extends Controller
 
     /**
      * Auto-generate an order number when not provided.
-     * Modes:
-     *  - sequential: 1,2,3,... per day per shop
-     *  - random:     random 3–4 digit code, unique per day per shop
+     *
+     * Simple scheme:
+     *  - Per shop per day, sequential 3-digit number: 001, 002, ..., 999
+     *  - Resets every date (we filter by order_date using whereDate)
      */
-    protected function generateOrderNo(int $shopId, string $date, string $mode): string
+    protected function generateOrderNo(int $shopId, string $date): string
     {
-        if ($mode === 'random') {
-            for ($i = 0; $i < 10; $i++) {
-                $candidate = (string) random_int(100, 9999);
-                $exists = Order::where('shop_id', $shopId)
-                    ->where('order_date', $date)
-                    ->where('order_no', $candidate)
-                    ->exists();
-
-                if (!$exists) {
-                    return $candidate;
-                }
-            }
-            throw new \RuntimeException('RANDOM_EXHAUSTED');
-        }
-
-        // Default: sequential
+        // Use GLOB instead of REGEXP for SQLite compatibility
         $max = Order::where('shop_id', $shopId)
-            ->where('order_date', $date)
-            ->max(DB::raw('CAST(order_no AS UNSIGNED)'));
+            ->whereDate('order_date', $date)
+            ->whereRaw("order_no GLOB '[0-9][0-9][0-9]'")
+            ->max('order_no');
 
         $next = $max ? ((int) $max + 1) : 1;
-        return (string) $next;
+
+        if ($next > 999) {
+            throw new \RuntimeException('ORDER_NO_OVERFLOW');
+        }
+
+        return str_pad((string) $next, 3, '0', STR_PAD_LEFT);
     }
 }

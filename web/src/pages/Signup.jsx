@@ -258,11 +258,23 @@ export default function Signup() {
               {t("password_requirements_title")}
             </div>
             <ul className="mt-1 text-xs list-disc pl-5">
-              <ChecklistItem ok={pwChecks.length} label={t("pw_req_length")} />
-              <ChecklistItem ok={pwChecks.upper} label={t("pw_req_upper")} />
-              <ChecklistItem ok={pwChecks.number} label={t("pw_req_number")} />
-              <ChecklistItem ok={pwChecks.allowed} label={t("pw_req_chars")} />
-              <ChecklistItem ok={pwMatch} label={t("pw_req_match")} />
+              <ChecklistItem
+                ok={pwChecks.length}
+                label={t("password_rule_length")}
+              />
+              <ChecklistItem
+                ok={pwChecks.upper}
+                label={t("password_rule_uppercase")}
+              />
+              <ChecklistItem
+                ok={pwChecks.number}
+                label={t("password_rule_number")}
+              />
+              <ChecklistItem
+                ok={pwChecks.allowed}
+                label={t("password_rule_symbol")}
+              />
+              <ChecklistItem ok={pwMatch} label={t("password_rule_match")} />
             </ul>
           </div>
 

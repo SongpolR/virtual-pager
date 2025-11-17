@@ -27,7 +27,7 @@ return new class extends Migration {
     Schema::create('shops', function (Blueprint $t) {
       $t->id();
       $t->foreignId('owner_id')->constrained('owners')->cascadeOnDelete();
-      $t->string('name')->default('My Cafe');
+      $t->string('name')->default('My Shop');
       $t->string('order_numbering_mode', 20)->default('sequential');
       $t->unsignedInteger('seq_start')->default(1);
       $t->enum('seq_reset_policy', ['none', 'daily'])->default('daily');

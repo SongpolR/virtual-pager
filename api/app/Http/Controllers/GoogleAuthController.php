@@ -50,7 +50,7 @@ class GoogleAuthController extends Controller
                 'owner_id' => $ownerId,
                 'name' => 'My Cafe',
                 'logo_url' => null,
-                'order_mode' => 'SEQUENTIAL',
+                'order_numbering_mode' => 'sequential',
                 'seq_next' => 1,
                 'random_min' => 100,
                 'random_max' => 999,

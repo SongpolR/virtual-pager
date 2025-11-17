@@ -29,14 +29,20 @@ i18n.use(initReactI18next).init({
         confirm: "Confirm",
         cancel: "Cancel",
         back: "Back",
+        your_name: "Your name",
+        confirm_password: "Confirm password",
+        back_to_login: "Back to Login",
+        email_address: "Email address",
+        close: "Close",
+        remove: "Remove",
 
         /* ---------- Auth / Login ---------- */
         login: "Login",
         signup: "Sign up",
+        or_signin: "Already have an account?",
         create_account: "Create account",
         sign_in_google: "Sign in with Google",
         reset_password: "Reset Password",
-        incorrect_password: "Incorrect password.",
         verify_now: "Verify now",
         reset_password_here: "Reset password here",
         login_type_owner: "Owner",
@@ -53,25 +59,31 @@ i18n.use(initReactI18next).init({
           "Your staff account has not been activated yet.",
         login_staff_inactive: "This staff account is inactive.",
         login_staff_bad_password: "Incorrect password.",
+        switch_to_owner_login: "Switch to Owner login",
         login_staff_contact_owner:
           "Please contact your shop owner to continue.",
 
         /* ---------- Signup ---------- */
-        signup_success:
-          "Sign up successful! Please check your email to verify your account.",
-        password_requirements: "Password must include:",
+        logo_requirements_title: "Logo requirements",
+        logo_req_size: "File size ≤ 2 MB",
+        logo_req_resolution: "Resolution ≤ 1024×1024 px",
+        logo_req_types: "PNG / JPG / JPEG",
+        password_requirements_title: "Password requirements",
         password_rule_uppercase: "At least one uppercase letter",
         password_rule_number: "At least one number",
         password_rule_length: "At least 8 characters",
-        password_rule_symbol: "Allowed symbols: ! @ # $ % ^ & * . _ -",
+        password_rule_symbol: "At least one symbol: ! @ # $ % ^ & * . _ -",
+        password_rule_match: "Password and confirmation password matched",
         password_confirm: "Confirm Password",
-        password_mismatch: "Passwords do not match",
 
         /* ---------- Email verification ---------- */
-        verification_title: "Email Verification",
-        verification_success:
-          "Your email has been successfully verified. You can now log in.",
-        resend_verification: "Resend verification email",
+        verify_email_title: "Verify your email",
+        verify_email_desc:
+          "We’ve sent a verification link to your email. If you didn’t get it, you can resend it below.",
+        link_sent:
+          "If an account exists for this email, we have sent a new verification link.",
+        resend_link: "Resend verification link",
+        open_email_app: "Open email app",
 
         /* ---------- Error Codes ---------- */
         errors: {
@@ -101,10 +113,38 @@ i18n.use(initReactI18next).init({
          * ORDERS PAGE
          * ------------------------------------------------------------------ */
         orders_title: "Orders",
-        orders_intro:
-          "This is the shared order workspace for owners and staff. Here you will see active orders, create new ones, and mark them as ready or done.",
-        orders_placeholder:
-          "In the next step, we will add the real-time order list and actions here.",
+        order_created: "Order created.",
+        order_updated: "Order updated.",
+        order_number_conflict: "Order number already exists for today.",
+        order_invalid_transition:
+          "Cannot change to this status from current state.",
+        order_not_found: "Order not found.",
+        refresh: "Refresh",
+        order_create_title: "Create order",
+        order_create_subtitle:
+          "Leave Order No. empty to let the system generate it. Fill it if you want to match a POS ticket number.",
+        order_no_label: "Order No. (optional)",
+        order_no_placeholder: "e.g. A-101",
+        pos_ref_label: "POS Ref (optional)",
+        pos_ref_placeholder: "e.g. POS-2025-0001",
+        order_create_button: "Create",
+        order_creating: "Creating...",
+        order_status_pending: "Pending",
+        order_status_ready: "Ready",
+        order_status_done: "Done",
+        orders_empty: "No orders",
+        order_label: "Order",
+        order_item_unnamed: "Item",
+        order_items_more: "More items...",
+        mark_ready: "Mark ready",
+        mark_done: "Mark done",
+        order_items_title: "Order items",
+        add_item: "Add item",
+        order_item_name_placeholder: "e.g. Pad Thai, Americano",
+        qty_label: "Qty",
+        order_item_note_placeholder: "Note (optional)",
+        view_qr: "View QR",
+        open_customer_page: "Open page",
 
         /* ------------------------------------------------------------------
          * SHOP SETTINGS
@@ -170,6 +210,12 @@ i18n.use(initReactI18next).init({
         confirm: "ยืนยัน",
         cancel: "ยกเลิก",
         back: "กลับ",
+        your_name: "ชื่อของคุณ",
+        confirm_password: "ยืนยันรหัสผ่าน",
+        back_to_login: "กลับสู่หน้าเข้าสู่ระบบ",
+        email_address: "ที่อยู่อีเมล",
+        close: "ปิด",
+        remove: "ลบ",
 
         /* ---------- Auth / Login ---------- */
         login: "เข้าสู่ระบบ",
@@ -177,7 +223,6 @@ i18n.use(initReactI18next).init({
         create_account: "สร้างบัญชี",
         sign_in_google: "เข้าสู่ระบบด้วย Google",
         reset_password: "รีเซ็ตรหัสผ่าน",
-        incorrect_password: "รหัสผ่านไม่ถูกต้อง",
         verify_now: "ยืนยันตอนนี้",
         reset_password_here: "รีเซ็ตรหัสผ่านที่นี่",
         login_type_owner: "เจ้าของ",
@@ -190,24 +235,27 @@ i18n.use(initReactI18next).init({
         login_staff_not_found: "อีเมลนี้ไม่พบในรายชื่อพนักงาน",
         login_staff_invite_pending: "บัญชีพนักงานยังไม่ได้เปิดใช้งาน",
         login_staff_inactive: "บัญชีพนักงานถูกปิดใช้งาน",
+        switch_to_owner_login: "สลับไปเข้าสู่ระบบเจ้าของร้าน",
         login_staff_bad_password: "รหัสผ่านไม่ถูกต้อง",
         login_staff_contact_owner: "กรุณาติดต่อเจ้าของร้าน",
 
         /* ---------- Signup ---------- */
-        signup_success: "สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี",
-        password_requirements: "รหัสผ่านต้องประกอบด้วย:",
+        logo_requirements_title: "ข้อกำหนดโลโก้",
+        password_requirements_title: "ข้อกำหนดรหัสผ่าน",
         password_rule_uppercase: "ตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว",
         password_rule_number: "ตัวเลขอย่างน้อย 1 ตัว",
         password_rule_length: "ความยาวอย่างน้อย 8 ตัวอักษร",
-        password_rule_symbol: "สัญลักษณ์ที่อนุญาต: ! @ # $ % ^ & * . _ -",
+        password_rule_symbol: "สัญลักษณ์อย่างน้อย 1 ตัว: ! @ # $ % ^ & * . _ -",
         password_confirm: "ยืนยันรหัสผ่าน",
-        password_mismatch: "รหัสผ่านไม่ตรงกัน",
+        password_rule_match: "Password and confirmation password matched",
 
         /* ---------- Email verification ---------- */
-        verification_title: "ยืนยันอีเมล",
-        verification_success:
-          "ยืนยันอีเมลเรียบร้อยแล้ว คุณสามารถเข้าสู่ระบบได้",
-        resend_verification: "ส่งอีเมลยืนยันอีกครั้ง",
+        verify_email_title: "ยืนยันอีเมลของคุณ",
+        verify_email_desc:
+          "เราได้ส่งลิงก์ยืนยันไปยังอีเมลของคุณ หากยังไม่ได้รับ คุณสามารถส่งอีกครั้งได้ด้านล่าง",
+        link_sent: "ถ้ามีบัญชีนี้อยู่ เราได้ส่งลิงก์ยืนยันใหม่ให้แล้ว",
+        resend_link: "ส่งลิงก์ยืนยันอีกครั้ง",
+        open_email_app: "เปิดแอปอีเมล",
 
         /* ---------- Error Codes ---------- */
         errors: {
@@ -235,10 +283,37 @@ i18n.use(initReactI18next).init({
          * ORDERS PAGE
          * ------------------------------------------------------------------ */
         orders_title: "ออเดอร์",
-        orders_intro:
-          "พื้นที่ทำงานร่วมของเจ้าของร้านและพนักงาน ที่นี่คุณจะเห็นออเดอร์ที่กำลังดำเนินการ สร้างออเดอร์ใหม่ และเปลี่ยนสถานะได้",
-        orders_placeholder:
-          "ในขั้นตอนถัดไป เราจะเพิ่มรายการออเดอร์แบบเรียลไทม์ที่นี่",
+        order_created: "สร้างออเดอร์เรียบร้อยแล้ว",
+        order_updated: "อัปเดตออเดอร์เรียบร้อยแล้ว",
+        order_number_conflict: "มีหมายเลขออเดอร์นี้ในวันนี้แล้ว",
+        order_invalid_transition: "ไม่สามารถเปลี่ยนสถานะจากสถานะปัจจุบันได้",
+        order_not_found: "ไม่พบออเดอร์นี้",
+        refresh: "รีเฟรช",
+        order_create_title: "สร้างออเดอร์ใหม่",
+        order_create_subtitle:
+          "ปล่อยช่องหมายเลขออเดอร์ว่างไว้ หากต้องการให้ระบบสร้างให้โดยอัตโนมัติ หรือกรอกหมายเลขหากต้องการใช้หมายเลขเดียวกับ POS",
+        order_no_label: "หมายเลขออเดอร์ (ไม่บังคับ)",
+        order_no_placeholder: "เช่น A-101",
+        pos_ref_label: "หมายเลขอ้างอิงจาก POS (ไม่บังคับ)",
+        pos_ref_placeholder: "เช่น POS-2025-0001",
+        order_create_button: "สร้างออเดอร์",
+        order_creating: "กำลังสร้าง...",
+        order_status_pending: "กำลังทำ",
+        order_status_ready: "พร้อมเสิร์ฟ",
+        order_status_done: "เสร็จสิ้น",
+        orders_empty: "ยังไม่มีออเดอร์",
+        order_label: "ออเดอร์",
+        order_item_unnamed: "สินค้า",
+        order_items_more: "ดูเพิ่มเติม...",
+        mark_ready: "แจ้งพร้อมเสิร์ฟ",
+        mark_done: "เสร็จสิ้น",
+        order_items_title: "รายการสินค้าในออเดอร์",
+        add_item: "เพิ่มรายการ",
+        order_item_name_placeholder: "เช่น ผัดไทย, อเมริกาโน่",
+        qty_label: "จำนวน",
+        order_item_note_placeholder: "หมายเหตุ (ไม่บังคับ)",
+        view_qr: "ดู QR ขนาดใหญ่",
+        open_customer_page: "เปิดหน้าลูกค้า",
 
         /* ------------------------------------------------------------------
          * SHOP SETTINGS

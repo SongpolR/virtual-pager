@@ -100,11 +100,23 @@ export default function StaffSetup() {
             {t("password_requirements_title")}
           </div>
           <ul className="mt-1 text-xs list-disc pl-5">
-            <ChecklistItem ok={checks.length} label={t("pw_req_length")} />
-            <ChecklistItem ok={checks.upper} label={t("pw_req_upper")} />
-            <ChecklistItem ok={checks.number} label={t("pw_req_number")} />
-            <ChecklistItem ok={checks.allowed} label={t("pw_req_chars")} />
-            <ChecklistItem ok={match} label={t("pw_req_match")} />
+            <ChecklistItem
+              ok={checks.length}
+              label={t("password_rule_length")}
+            />
+            <ChecklistItem
+              ok={checks.upper}
+              label={t("password_rule_uppercase")}
+            />
+            <ChecklistItem
+              ok={checks.number}
+              label={t("password_rule_number")}
+            />
+            <ChecklistItem
+              ok={checks.allowed}
+              label={t("password_rule_symbol")}
+            />
+            <ChecklistItem ok={match} label={t("password_rule_match")} />
           </ul>
         </div>
 

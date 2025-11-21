@@ -2,6 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import GoogleIcon from "../components/icons/GoogleIcon.jsx";
 import ChecklistItem from "../components/ChecklistItem.jsx";
+import api from "../lib/api";
+import {
+  mapFieldValidationErrors,
+  getGlobalErrorFromAxios,
+} from "../lib/errorHelpers";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
@@ -18,13 +23,14 @@ export default function Signup() {
     name: "",
     email: initialEmail,
     password: "",
-    password_confirmation: "",
+    confirm_password: "",
     shop_name: "",
   });
   const [logo, setLogo] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoMeta, setLogoMeta] = useState({ w: null, h: null, error: "" });
   const [submitErr, setSubmitErr] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
 
   // Password live checks
   const pw = form.password || "";
@@ -39,8 +45,8 @@ export default function Signup() {
   );
   const pwMatch =
     form.password &&
-    form.password_confirmation &&
-    form.password === form.password_confirmation;
+    form.confirm_password &&
+    form.password === form.confirm_password;
   const allPwOk =
     pw &&
     pwChecks.length &&
@@ -88,8 +94,8 @@ export default function Signup() {
   }, [logo, t]); // revoke preview when unmount or new file chosen
 
   const validateBeforeSubmit = () => {
-    if (!allPwOk) return t("password_requirements_title");
-    if (!pwMatch) return t("confirm_password"); // simple hint
+    if (!allPwOk) return t("password_requirements_error");
+    if (!pwMatch) return t("confirm_password_incorrect"); // simple hint
     if (logoMeta.error) return logoMeta.error;
     return "";
   };
@@ -121,9 +127,26 @@ export default function Signup() {
     );
   };
 
+  const updateField = (field, value) => {
+    // Update the form state
+    setForm((prev) => ({ ...prev, [field]: value }));
+
+    // Clear field-level error
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+
+    // Clear global submit error
+    if (submitErr) setSubmitErr("");
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     setSubmitErr("");
+    setFieldErrors({});
 
     const v = validateBeforeSubmit();
     if (v) {
@@ -135,26 +158,67 @@ export default function Signup() {
     fd.append("name", form.name);
     fd.append("email", form.email);
     fd.append("password", form.password);
-    fd.append("password_confirmation", form.password_confirmation);
+    fd.append("confirm_password", form.confirm_password);
     fd.append("shop_name", form.shop_name);
     if (logo) fd.append("logo", logo);
 
-    const res = await fetch(`${API}/auth/signup`, { method: "POST", body: fd });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      if (Array.isArray(data.errors)) {
-        const msgs = data.errors.map(
-          (code) => t(`errors.${code}`) // lookup numeric key
-        );
-        setSubmitErr(msgs.join(", "));
-      } else {
-        setSubmitErr(data.message || "Unknown error");
+    try {
+      const res = await api.post("/auth/signup", fd, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const data = res.data;
+
+      if (data?.success) {
+        // You can show a success toast using messages.SIGNUP_SUCCESS_NEED_VERIFY if you want
+        // const msgKey = `messages.${data.message}`;
+        // toast(t(msgKey) !== msgKey ? t(msgKey) : t("messages.SIGNUP_SUCCESS_NEED_VERIFY"));
+        location.href = "/login";
+        return;
       }
-      return;
+
+      // 2xx but success=false (rare)
+      if (data?.message) {
+        const key = `errors.${data.message}`;
+        const translated = t(key) !== key ? t(key) : data.message;
+        setSubmitErr(translated);
+      } else {
+        setSubmitErr(t("errors.9000") || "Unexpected error");
+      }
+    } catch (err) {
+      if (!err.response) {
+        // network or unknown
+        setSubmitErr(getGlobalErrorFromAxios(err, t));
+        return;
+      }
+
+      const { status, data } = err.response;
+
+      // Validation errors (422) with field mapping
+      if (status === 422 && data?.errors && typeof data.errors === "object") {
+        const fe = mapFieldValidationErrors(data.errors, t);
+        setFieldErrors(fe);
+
+        // Also set a generic validation message at top (optional)
+        const globalMsg = getGlobalErrorFromAxios(err, t, {
+          defaultValidationCode: 1000,
+        });
+        setSubmitErr(globalMsg);
+        return;
+      }
+
+      // Legacy style: errors is an array of numeric codes
+      if (Array.isArray(data?.errors)) {
+        const msgs = data.errors.map((code) => t(`errors.${code}`));
+        setSubmitErr(msgs.join(", "));
+        return;
+      }
+
+      // Non-validation error with message as code
+      setSubmitErr(getGlobalErrorFromAxios(err, t));
     }
-    const data = await res.json();
-    localStorage.setItem("token", data.token);
-    location.href = "/login";
   };
 
   return (
@@ -169,18 +233,38 @@ export default function Signup() {
           {/* Shop name */}
           <label className="block mt-4 text-sm">{t("shop_name")}</label>
           <input
-            className="border p-2 rounded w-full"
-            required
+            className={`border p-2 rounded w-full ${
+              fieldErrors.shop_name ? "border-red-500" : ""
+            }`}
             value={form.shop_name}
-            onChange={(e) => setForm({ ...form, shop_name: e.target.value })}
+            onChange={(e) => updateField("shop_name", e.target.value)}
+            required
           />
+          {fieldErrors.shop_name && (
+            <div className="mt-1 text-xs text-red-600">
+              {fieldErrors.shop_name}
+            </div>
+          )}
 
           {/* Shop logo with preview + bullets */}
           <label className="block mt-4 text-sm">{t("shop_logo")}</label>
           <input
             type="file"
             accept="image/png,image/jpeg"
-            onChange={(e) => setLogo(e.target.files?.[0] || null)}
+            onChange={(e) => {
+              setLogo(e.target.files?.[0] || null);
+
+              // Clear field error for "logo"
+              setFieldErrors((prev) => {
+                if (!prev.logo) return prev;
+                const next = { ...prev };
+                delete next.logo;
+                return next;
+              });
+
+              if (submitErr) setSubmitErr("");
+            }}
+            required
           />
           <div className="mt-2">
             <div className="text-xs text-gray-500 font-medium">
@@ -211,47 +295,72 @@ export default function Signup() {
           {logoMeta.error && (
             <div className="mt-2 text-xs text-red-600">{logoMeta.error}</div>
           )}
+          {fieldErrors.logo && (
+            <div className="mt-1 text-xs text-red-600">{fieldErrors.logo}</div>
+          )}
 
           {/* Your name */}
           <label className="block mt-4 text-sm">{t("your_name")}</label>
           <input
-            className="border p-2 rounded w-full"
-            required
+            className={`border p-2 rounded w-full ${
+              fieldErrors.name ? "border-red-500" : ""
+            }`}
             value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            onChange={(e) => updateField("name", e.target.value)}
+            required
           />
+          {fieldErrors.name && (
+            <div className="mt-1 text-xs text-red-600">{fieldErrors.name}</div>
+          )}
 
           {/* Email */}
           <label className="block mt-4 text-sm">{t("email")}</label>
           <input
             type="email"
-            className="border p-2 rounded w-full"
-            required
+            className={`border p-2 rounded w-full ${
+              fieldErrors.email ? "border-red-500" : ""
+            }`}
             value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            onChange={(e) => updateField("email", e.target.value)}
+            required
           />
+          {fieldErrors.email && (
+            <div className="mt-1 text-xs text-red-600">{fieldErrors.email}</div>
+          )}
 
-          {/* Password with live checklist */}
+          {/* Password */}
           <label className="block mt-4 text-sm">{t("password")}</label>
           <input
             type="password"
-            className="border p-2 rounded w-full"
-            required
+            className={`border p-2 rounded w-full ${
+              fieldErrors.password ? "border-red-500" : ""
+            }`}
             value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            onChange={(e) => updateField("password", e.target.value)}
+            required
           />
+          {fieldErrors.password && (
+            <div className="mt-1 text-xs text-red-600">
+              {fieldErrors.password}
+            </div>
+          )}
 
-          {/* Password confirmation */}
+          {/* Confirm Password */}
           <label className="block mt-4 text-sm">{t("confirm_password")}</label>
           <input
             type="password"
-            className="border p-2 rounded w-full"
+            className={`border p-2 rounded w-full ${
+              fieldErrors.confirm_password ? "border-red-500" : ""
+            }`}
+            value={form.confirm_password}
+            onChange={(e) => updateField("confirm_password", e.target.value)}
             required
-            value={form.password_confirmation}
-            onChange={(e) =>
-              setForm({ ...form, password_confirmation: e.target.value })
-            }
           />
+          {fieldErrors.confirm_password && (
+            <div className="mt-1 text-xs text-red-600">
+              {fieldErrors.confirm_password}
+            </div>
+          )}
 
           <div className="mt-2">
             <div className="text-xs text-gray-500 font-medium">
@@ -286,14 +395,14 @@ export default function Signup() {
           {/* Submit */}
           <button
             className="mt-4 w-full bg-black text-white rounded py-2 disabled:opacity-50"
-            disabled={
-              !form.shop_name ||
-              !form.name ||
-              !form.email ||
-              !allPwOk ||
-              !pwMatch ||
-              !!logoMeta.error
-            }
+            // disabled={
+            //   !form.shop_name ||
+            //   !form.name ||
+            //   !form.email ||
+            //   !allPwOk ||
+            //   !pwMatch ||
+            //   !!logoMeta.error
+            // }
           >
             {t("signup")}
           </button>

@@ -25,6 +25,8 @@ import LanguageSwitcher from "./components/LanguageSwitcher.jsx";
 // ---------- i18n ----------
 import { useTranslation } from "react-i18next";
 
+import SessionExpiredModal from "./components/SessionExpiredModal";
+
 // Simple language switch on top-right
 function LangSwitcher() {
   const { i18n } = useTranslation();
@@ -142,6 +144,8 @@ const router = createBrowserRouter([
 ]);
 
 function AppRoot() {
+  const [sessionExpired, setSessionExpired] = React.useState(false);
+
   React.useEffect(() => {
     const lang = localStorage.getItem("lang");
     if (lang) {
@@ -149,7 +153,26 @@ function AppRoot() {
     }
   }, []);
 
-  return <RouterProvider router={router} />;
+  React.useEffect(() => {
+    const handleSessionExpired = () => {
+      setSessionExpired(true);
+    };
+
+    window.addEventListener("session-expired", handleSessionExpired);
+    return () => {
+      window.removeEventListener("session-expired", handleSessionExpired);
+    };
+  }, []);
+
+  return (
+    <>
+      {/* Global, highest-priority modal */}
+      <SessionExpiredModal open={sessionExpired} />
+
+      {/* Existing router */}
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(

@@ -14,58 +14,66 @@ use App\Mail\PasswordResetMail;
 
 class AuthController extends Controller
 {
+
   public function signup(Request $req)
   {
     try {
       $req->validate([
-        'name' => 'required|string|max:120',
-        'email' => 'required|email|max:190|unique:owners,email',
-        'password' => [
+        'name'      => 'required|string|max:120',
+        'email'     => 'required|email|max:190|unique:owners,email',
+        'password'  => [
           'required',
           'string',
           'min:8',
           'regex:/[A-Z]/',
           'regex:/[0-9]/',
           'regex:/^[A-Za-z0-9!@#$%^&*._-]+$/',
-          'confirmed'
         ],
-        'password_confirmation' => 'required|string',
+        'confirm_password' => 'required|string|same:password',
         'shop_name' => 'required|string|max:120',
-        'logo' => 'nullable|image|max:2048',
+        'logo'      => 'nullable|image|max:2048',
       ]);
 
       // resolution limit ≤ 1024×1024
       if ($req->hasFile('logo')) {
         [$w, $h] = getimagesize($req->file('logo')->getPathname());
         if ($w > 1024 || $h > 1024) {
-          return response()->json(['error' => 'logo_resolution_too_large'], 422);
+          return response()->json([
+            'success' => false,
+            'message' => 'VALIDATION_FAILED',
+            'errors'  => [
+              'logo' => [[
+                'code' => config('errorcodes.LOGO_TOO_LARGE'),
+                'meta' => [
+                  'max_width'  => 1024,
+                  'max_height' => 1024,
+                ],
+              ]],
+            ],
+          ], 422);
         }
       }
 
       return DB::transaction(function () use ($req) {
         $ownerId = DB::table('owners')->insertGetId([
-          'name' => $req->name,
-          'email' => $req->email,
-          'password' => Hash::make($req->password),
+          'name'       => $req->name,
+          'email'      => $req->email,
+          'password'   => Hash::make($req->password),
           'created_at' => now(),
           'updated_at' => now(),
         ]);
 
         $logoUrl = null;
         if ($req->hasFile('logo')) {
-          $path = $req->file('logo')->store('public/logos');
+          $path    = $req->file('logo')->store('public/logos');
           $logoUrl = Storage::url($path); // needs storage:link
         }
 
         DB::table('shops')->insert([
-          'owner_id' => $ownerId,
-          'name' => $req->shop_name,
-          'logo_url' => $logoUrl,
-          'order_numbering_mode' => 'sequential',
-          'seq_next' => 1,
-          'random_min' => 100,
-          'random_max' => 999,
-          'sound_key' => 'ding',
+          'owner_id'   => $ownerId,
+          'name'       => $req->shop_name,
+          'logo_url'   => $logoUrl,
+          'sound_key'  => 'ding',
           'created_at' => now(),
           'updated_at' => now(),
         ]);
@@ -79,32 +87,71 @@ class AuthController extends Controller
         Mail::to($req->email)->send(new VerifyEmailMail($verifyUrl));
 
         return response()->json([
-          'message' => 'Signup successful. Please verify your email to continue.',
-          'errors' => []
-        ], 200);
+          'success' => true,
+          'message' => 'SIGNUP_SUCCESS_NEED_VERIFY',
+          'data'    => [
+            'email' => $req->email,
+          ],
+        ], 201);
       });
     } catch (\Illuminate\Validation\ValidationException $e) {
-      $codes = [];
-      foreach ($e->errors() as $field => $messages) {
-        foreach ($messages as $msg) {
-          if (str_contains($msg, 'taken')) $codes[] = config('errorcodes.EMAIL_TAKEN');
-          elseif (str_contains($msg, 'required')) $codes[] = config('errorcodes.REQUIRED_FIELD');
-          elseif (str_contains($msg, 'valid')) $codes[] = config('errorcodes.INVALID_FORMAT');
-          else $codes[] = config('errorcodes.UNKNOWN');
+      $errors = [];
+      $failed = $e->validator->failed(); // field => [rule => params]
+
+      foreach ($failed as $field => $rules) {
+        foreach ($rules as $rule => $params) {
+          $ruleUpper = strtoupper($rule);
+
+          logger($ruleUpper);
+
+          $code = match ($ruleUpper) {
+            'REQUIRED' => config('errorcodes.REQUIRED_FIELD'),
+            'EMAIL'    => config('errorcodes.INVALID_EMAIL'),
+            'UNIQUE'   => config('errorcodes.EMAIL_TAKEN'),
+            'MAX'      => config('errorcodes.TOO_LONG'),
+            'MIN'      => config('errorcodes.TOO_SHORT'),
+            'IMAGE'    => config('errorcodes.INVALID_IMAGE'),
+            'REGEX'    => config('errorcodes.INVALID_FORMAT'),
+            'SAME'     => config('errorcodes.PASSWORD_NOT_SAME'),
+            default    => config('errorcodes.VALIDATION_ERROR'),
+          };
+
+          $meta = [];
+          // For rules like min:8 / max:120 we can expose the limit
+          if ($ruleUpper === 'MIN' && isset($params[0])) {
+            $meta['min'] = $params[0];
+          }
+          if ($ruleUpper === 'MAX' && isset($params[0])) {
+            $meta['max'] = $params[0];
+          }
+
+          $errors[$field][] = [
+            'code' => $code,
+            'meta' => $meta,
+          ];
         }
       }
 
       return response()->json([
-        'message' => 'Validation failed',
-        'errors'  => array_values(array_unique($codes)),
+        'success' => false,
+        'message' => 'VALIDATION_FAILED',
+        'errors'  => $errors,
       ], 422);
     } catch (\Illuminate\Database\QueryException $e) {
+      // Fallback in case a duplicate slips past validation (race condition)
       if (str_contains($e->getMessage(), 'Duplicate')) {
         return response()->json([
-          'message' => 'Email already registered',
-          'errors'  => [config('errorcodes.EMAIL_TAKEN')],
+          'success' => false,
+          'message' => 'VALIDATION_FAILED',
+          'errors'  => [
+            'email' => [[
+              'code' => config('errorcodes.EMAIL_TAKEN'),
+              'meta' => [],
+            ]],
+          ],
         ], 422);
       }
+
       throw $e;
     }
   }

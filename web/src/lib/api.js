@@ -1,36 +1,38 @@
-const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+// web/src/lib/api.js
+import axios from "axios";
 
-export const auth = {
-  setToken(t) {
-    localStorage.setItem("token", t);
-  },
-  getToken() {
-    return localStorage.getItem("token") || "";
-  },
-  clear() {
-    localStorage.removeItem("token");
-  },
-};
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
-export async function apiGet(path) {
-  const res = await fetch(`${API}${path}`, {
-    headers: { Authorization: `Bearer ${auth.getToken()}` },
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
+const api = axios.create({
+  baseURL: API_BASE,
+});
 
-export async function apiPost(path, body, opts = {}) {
-  const isForm = body instanceof FormData;
-  const res = await fetch(`${API}${path}`, {
-    method: opts.method || "POST",
-    body: isForm ? body : JSON.stringify(body || {}),
-    headers: {
-      ...(isForm ? {} : { "Content-Type": "application/json" }),
-      Authorization: `Bearer ${auth.getToken()}`,
-      ...(opts.headers || {}),
-    },
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
+// Attach token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Global 401 handler → fire "session-expired" event
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+
+    if (status === 401) {
+      // เคลียร์ session เผื่อไว้เลย
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // แจ้งไปยัง React ผ่าน custom event
+      window.dispatchEvent(new Event("session-expired"));
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default api;

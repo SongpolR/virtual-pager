@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { QRCodeCanvas } from "qrcode.react";
+import api from "../lib/api";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 // Base URL for customer-facing order page
 const CUSTOMER_BASE_URL =
   import.meta.env.VITE_CUSTOMER_URL || window.location.origin;
@@ -36,29 +36,23 @@ export default function Orders() {
   };
 
   // ---- Load orders ----
-  const loadOrders = async () => {
-    setLoading(true);
-    setError(null);
+  async function loadOrders() {
     try {
-      const r = await fetch(`${API}/orders`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!r.ok) {
-        const data = await r.json().catch(() => ({}));
-        setError(data.message || t("errors.1999"));
-        setOrders([]);
-      } else {
-        const data = await r.json();
-        setOrders(Array.isArray(data) ? data : []);
+      const res = await api.get("/orders");
+
+      // Laravel usually returns { data: [...] }
+      setOrders(res.data.data ?? res.data);
+      setError(null);
+    } catch (err) {
+      // 401 is already handled globally (redirect) → no need to show banner
+      if (err?.response?.status === 401) {
+        return;
       }
-    } catch (e) {
-      console.error(e);
-      setError(t("errors.1999"));
-      setOrders([]);
-    } finally {
-      setLoading(false);
+
+      const message = err?.response?.data?.message || "Failed to load orders";
+      setError(message);
     }
-  };
+  }
 
   useEffect(() => {
     loadOrders();
@@ -117,41 +111,26 @@ export default function Orders() {
         body.items = cleanedItems;
       }
 
-      const r = await fetch(`${API}/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
+      const { data } = await api.post("/orders", {});
 
-      const data = await r.json().catch(() => null);
-
-      if (!r.ok) {
-        const code =
-          data && Array.isArray(data.errors) && data.errors.length
-            ? data.errors[0]
-            : null;
-        if (code === 1502) {
-          setError(
-            t("order_number_conflict") ||
-              "Order number already exists for today."
-          );
-        } else {
-          setError(data?.message || t("errors.1999"));
-        }
-      } else {
-        setMessage(t("order_created") || "Order created.");
-        setOrderNo("");
-        setPosRef("");
-        setItems([{ name: "", qty: 1, note: "" }]);
-        // reload list
-        loadOrders();
-      }
+      setMessage(t("order_created") || "Order created.");
+      setOrderNo("");
+      setPosRef("");
+      setItems([{ name: "", qty: 1, note: "" }]);
+      // reload list
+      loadOrders();
     } catch (e) {
-      console.error(e);
-      setError(t("errors.1999"));
+      const code =
+        data && Array.isArray(data.errors) && data.errors.length
+          ? data.errors[0]
+          : null;
+      if (code === 1502) {
+        setError(
+          t("order_number_conflict") || "Order number already exists for today."
+        );
+      } else {
+        setError(data?.message || t("errors.1999"));
+      }
     } finally {
       setCreating(false);
     }

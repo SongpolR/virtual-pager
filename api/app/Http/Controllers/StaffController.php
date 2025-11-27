@@ -120,6 +120,29 @@ class StaffController extends Controller
     }
 
     /**
+     * Activate a staff account (unlock).
+     * Owner-only (protect via middleware: ['owner','verified'])
+     */
+    public function activate($id)
+    {
+        $affected = DB::table('staffs')
+            ->where('id', $id)
+            ->update([
+                'is_active'  => true,
+                'updated_at' => now(),
+            ]);
+
+        if (!$affected) {
+            return response()->json([
+                'message' => 'ACCOUNT_NOT_FOUND',
+                'errors'  => [config('errorcodes.ACCOUNT_NOT_FOUND')],
+            ], 404);
+        }
+
+        return response()->json(['success' => true, 'message' => 'OK']);
+    }
+
+    /**
      * Deactivate a staff account (soft lock).
      * Owner-only (protect via middleware: ['owner','verified'])
      */
@@ -134,12 +157,12 @@ class StaffController extends Controller
 
         if (!$affected) {
             return response()->json([
-                'message' => 'Account not found',
+                'message' => 'ACCOUNT_NOT_FOUND',
                 'errors'  => [config('errorcodes.ACCOUNT_NOT_FOUND')],
             ], 404);
         }
 
-        return response()->json(['ok' => true]);
+        return response()->json(['success' => true, 'message' => 'OK']);
     }
 
     /**

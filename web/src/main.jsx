@@ -19,10 +19,9 @@ import Orders from "./pages/Orders.jsx";
 import ShopSettings from "./pages/ShopSettings.jsx";
 import AccountSettings from "./pages/AccountSettings.jsx";
 import NotFound from "./pages/NotFound.jsx";
-
 import LanguageSwitcher from "./components/LanguageSwitcher.jsx";
-
 import SessionExpiredModal from "./components/SessionExpiredModal";
+import { ToastProvider } from "./components/ToastProvider";
 
 // Top navigation (shown only for logged-in pages)
 function TopNav({ role }) {
@@ -156,6 +155,8 @@ function AppRoot() {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AppRoot />
+    <ToastProvider>
+      <AppRoot />
+    </ToastProvider>
   </React.StrictMode>
 );

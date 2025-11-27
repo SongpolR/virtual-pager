@@ -22,13 +22,20 @@ class ShopController extends Controller
       $req->validate([
         'name'      => 'sometimes|required|string|max:120',
         'logo'      => 'sometimes|nullable|image|max:2048', // 2MB
-        'sound_key' => 'sometimes|required|string|in:ding,bell,chime,ping,beep',
+        'sound_key' => 'sometimes|required|string|in:arcade,fairy,flute,game,happy-bell,marimba,slot-machine,toy-telephone,urgent',
         'timezone'  => 'sometimes|required|timezone',
       ]);
 
-      // For MVP, assume single shop per owner
-      // (Later you can resolve by authenticated owner_id)
-      $shop = DB::table('shops')->first();
+      $ownerId = $req->attributes->get('owner_id');
+
+      if (!$ownerId) {
+        return response()->json([
+          'success' => false,
+          'message' => 'OWNER_NOT_AUTHENTICATED',
+        ], 401);
+      }
+
+      $shop = DB::table('shops')->where('owner_id', $ownerId)->first();
 
       if (!$shop) {
         return response()->json([
@@ -126,18 +133,5 @@ class ShopController extends Controller
         'errors'  => $errors,
       ], 422);
     }
-  }
-
-  public function uploadLogo(Request $req)
-  {
-    $req->validate(['logo' => 'required|image|max:2048']);
-    [$w, $h] = getimagesize($req->file('logo')->getPathname());
-    if ($w > 1024 || $h > 1024) {
-      return response()->json(['error' => 'logo_resolution_too_large'], 422);
-    }
-    $path = $req->file('logo')->store('public/logos');
-    $url = Storage::url($path);
-    DB::table('shops')->where('id', 1)->update(['logo_url' => $url, 'updated_at' => now()]);
-    return ['logo_url' => $url];
   }
 }

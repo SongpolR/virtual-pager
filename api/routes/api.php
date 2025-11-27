@@ -56,11 +56,12 @@ Route::post('/staff/login',  [StaffController::class, 'login']);
 Route::middleware(['owner', 'verified'])->group(function () {
   // Shop settings (profile, logo, order numbering policy, sound, etc.)
   Route::get('/shop',  [ShopController::class, 'show']);
-  Route::put('/shop',  [ShopController::class, 'update']); // expect multipart/form-data for logo if provided
+  Route::post('/shop',  [ShopController::class, 'update']); // expect multipart/form-data for logo if provided
 
   // Staff management (owner provisions)
   Route::get('/staff',                  [StaffController::class, 'index']);
   Route::post('/staff',                 [StaffController::class, 'create']);      // optional direct create
+  Route::post('/staff/{id}/activate', [StaffController::class, 'activate']);
   Route::post('/staff/{id}/deactivate', [StaffController::class, 'deactivate']);
 
   // Staff invitations (owner controls activation)

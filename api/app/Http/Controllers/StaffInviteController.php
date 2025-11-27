@@ -261,6 +261,6 @@ class StaffInviteController extends Controller
 
         Mail::to($email)->send(new StaffInviteMail($acceptUrl, $shop?->name ?? 'Your Shop'));
 
-        return response()->json(['message' => 'OK'], 200);
+        return response()->json(['success' => true, 'message' => 'OK'], 200);
     }
 }

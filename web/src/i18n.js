@@ -43,6 +43,7 @@ i18n.use(initReactI18next).init({
         create_account: "Create account",
         sign_in_google: "Sign in with Google",
         reset_password: "Reset Password",
+        activate: "Activate",
         deactivate: "Deactivate",
         verify_now: "Verify now",
         reset_password_here: "Reset password here",
@@ -196,6 +197,7 @@ i18n.use(initReactI18next).init({
         delete_shop: "Delete Shop",
         delete_shop_confirm:
           "Are you sure you want to delete this shop? This action cannot be undone.",
+        shop_saved: "Shop information updated successfully",
 
         /* Staff management section */
         invite_staff: "Invite Staff",
@@ -206,6 +208,8 @@ i18n.use(initReactI18next).init({
         resend_invite: "Resend Invite",
         invite_sent: "Invitation email sent successfully.",
         invite_resent: "Invitation email resent successfully.",
+        staff_activated: "Staff activated successfully.",
+        confirm_activate: "Are you sure you want to activate this staff?",
         staff_deactivated: "Staff deactivated successfully.",
         confirm_deactivate: "Are you sure you want to deactivate this staff?",
         no_staff: "No staff members found.",
@@ -222,20 +226,13 @@ i18n.use(initReactI18next).init({
           "Manage your personal account settings here. Additional options such as password change will be added soon.",
         change_password: "Change Password",
         password_change_coming: "Change password (coming soon)",
-        sound_options: {
-          ding: "Ding (Default)",
-          bell: "Bell",
-          chime: "Chime",
-          beep: "Beep",
-          ping: "Ping",
-        },
         timezone: "Timezone",
         timezones: {
-          "Asia/Bangkok": "Asia/Bangkok (ICT)",
-          "Asia/Singapore": "Asia/Singapore (SGT)",
-          "Asia/Tokyo": "Asia/Tokyo (JST)",
-          "Europe/London": "Europe/London (GMT/BST)",
-          "America/New_York": "America/New_York (EST/EDT)",
+          "Asia/Bangkok": "Asia/Bangkok",
+          "Asia/Singapore": "Asia/Singapore",
+          "Asia/Tokyo": "Asia/Tokyo",
+          "Europe/London": "Europe/London",
+          "America/New_York": "America/New_York",
         },
       },
     },
@@ -273,6 +270,7 @@ i18n.use(initReactI18next).init({
         create_account: "สร้างบัญชี",
         sign_in_google: "เข้าสู่ระบบด้วย Google",
         reset_password: "รีเซ็ตรหัสผ่าน",
+        activate: "เปิดใช้งาน",
         deactivate: "ปิดใช้งาน",
         verify_now: "ยืนยันตอนนี้",
         reset_password_here: "รีเซ็ตรหัสผ่านที่นี่",
@@ -418,6 +416,7 @@ i18n.use(initReactI18next).init({
         delete_shop: "ลบร้าน",
         delete_shop_confirm:
           "คุณแน่ใจหรือไม่ว่าต้องการลบร้าน? การกระทำนี้ไม่สามารถย้อนกลับได้",
+        shop_saved: "บันทึกข้อมูลร้านค้าเรียบร้อย",
 
         /* Staff management */
         invite_staff: "เชิญพนักงาน",
@@ -428,6 +427,8 @@ i18n.use(initReactI18next).init({
         resend_invite: "ส่งคำเชิญอีกครั้ง",
         invite_sent: "ส่งคำเชิญเรียบร้อยแล้ว",
         invite_resent: "ส่งคำเชิญอีกครั้งเรียบร้อยแล้ว",
+        staff_activated: "เปิดการใช้งานพนักงานเรียบร้อยแล้ว",
+        confirm_activate: "คุณแน่ใจหรือไม่ว่าต้องการเปิดการใช้งานพนักงานนี้?",
         staff_deactivated: "ปิดการใช้งานพนักงานเรียบร้อยแล้ว",
         confirm_deactivate: "คุณแน่ใจหรือไม่ว่าต้องการปิดการใช้งานพนักงานนี้?",
         no_staff: "ยังไม่มีพนักงาน",
@@ -445,16 +446,9 @@ i18n.use(initReactI18next).init({
         change_password: "เปลี่ยนรหัสผ่าน",
         password_change_coming: "เปลี่ยนรหัสผ่าน (เร็วๆ นี้)",
 
-        sound_options: {
-          ding: "ติ๊ง (ค่าเริ่มต้น)",
-          bell: "กระดิ่ง",
-          chime: "ไชม์",
-          beep: "บี๊บ",
-          ping: "ปิ๊ง",
-        },
         timezone: "โซนเวลา",
         timezones: {
-          "Asia/Bangkok": "Asia/Bangkok (เวลาไทย)",
+          "Asia/Bangkok": "Asia/Bangkok",
           "Asia/Singapore": "Asia/Singapore",
           "Asia/Tokyo": "Asia/Tokyo",
           "Europe/London": "Europe/London",

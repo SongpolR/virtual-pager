@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -40,7 +41,7 @@ class GoogleAuthController extends Controller
             $ownerId = DB::table('owners')->insertGetId([
                 'name' => $name,
                 'email' => $email,
-                'password' => null, // using Google
+                'password' => Hash::make(Str::random(32)), // using Google
                 'email_verified_at' => now(), // 👈 mark verified 
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -50,7 +51,7 @@ class GoogleAuthController extends Controller
                 'owner_id' => $ownerId,
                 'name' => 'My Shop',
                 'logo_url' => null,
-                'sound_key' => 'ding',
+                'sound_key' => 'happy-bell',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

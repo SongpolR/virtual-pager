@@ -8,13 +8,25 @@ import {
 } from "../lib/errorHelpers";
 import EditIcon from "../components/icons/EditIcon.jsx";
 import CancelIcon from "../components/icons/CancelIcon.jsx";
+import { useToast } from "../components/ToastProvider.jsx";
+import LoadingSpinner from "../components/LoadingSpinner.jsx";
 
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg"];
 const MAX_BYTES = 2 * 1024 * 1024;
 const MAX_W = 1024;
 const MAX_H = 1024;
 
-const SOUND_KEYS = ["ding", "bell", "chime", "ping", "beep"];
+const SOUND_KEYS = [
+  "arcade",
+  "fairy",
+  "flute",
+  "game",
+  "happy-bell",
+  "marimba",
+  "slot-machine",
+  "toy-telephone",
+  "urgent",
+];
 
 const TIMEZONES = [
   "Asia/Bangkok",
@@ -28,32 +40,27 @@ export default function ShopSettings() {
   const { t } = useTranslation();
 
   const [shop, setShop] = useState(null);
-  const [shopName, setShopName] = useState("");
-  const [isEditingShop, setIsEditingShop] = useState(false);
 
+  const [shopName, setShopName] = useState("");
+  const [shopFieldErrors, setShopFieldErrors] = useState({});
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoMeta, setLogoMeta] = useState({ w: null, h: null, error: "" });
-
   const logoInputRef = useRef(null);
-
-  const [staffs, setStaffs] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const [newEmail, setNewEmail] = useState("");
-  const [newName, setNewName] = useState("");
-  const [message, setMessage] = useState(null); // success/info
-  const [error, setError] = useState(null); // global error
-
-  // Separate field errors for shop form vs invite form
-  const [shopFieldErrors, setShopFieldErrors] = useState({});
-  const [inviteFieldErrors, setInviteFieldErrors] = useState({});
-
+  const [soundKey, setSoundKey] = useState(SOUND_KEYS[4]);
+  const soundRef = useRef(null);
+  const [timezone, setTimezone] = useState(TIMEZONES[0]);
   const [savingShop, setSavingShop] = useState(false);
+
+  const [inviteName, setInviteName] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteFieldErrors, setInviteFieldErrors] = useState({});
   const [inviting, setInviting] = useState(false);
 
-  const [soundKey, setSoundKey] = useState("ding");
-  const [timezone, setTimezone] = useState("Asia/Bangkok");
+  const [staffs, setStaffs] = useState([]);
+
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
 
   // Fetch shop + staff
   useEffect(() => {
@@ -70,48 +77,23 @@ export default function ShopSettings() {
           setShop(s);
           setShopName(s.name || "");
           setLogoPreview(s.logo_url || null);
-          setSoundKey(s.sound_key || "ding");
+          setSoundKey(s.sound_key || SOUND_KEYS[0]);
           setTimezone(
             s.timezone ||
               Intl.DateTimeFormat().resolvedOptions().timeZone ||
-              "Asia/Bangkok"
+              TIMEZONES[0]
           );
         }
 
         if (staffRes.data) setStaffs(staffRes.data);
       } catch (err) {
-        console.error(err);
-        setError(getGlobalErrorFromAxios(err, t));
+        showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
       } finally {
         setLoading(false);
       }
     };
     fetchAll();
   }, [t]);
-
-  // ---- Shop editing helpers ----
-  const startEditShop = () => {
-    setIsEditingShop(true);
-    setMessage(null);
-    setError(null);
-  };
-
-  const cancelEditShop = () => {
-    setIsEditingShop(false);
-    setShopName(shop?.name || "");
-    setLogoFile(null);
-    setLogoPreview(shop?.logo_url || null);
-    setLogoMeta({ w: null, h: null, error: "" });
-    setSoundKey(shop?.sound_key || "ding");
-    setTimezone(
-      shop?.timezone ||
-        Intl.DateTimeFormat().resolvedOptions().timeZone ||
-        "Asia/Bangkok"
-    );
-    setShopFieldErrors({});
-    setError(null);
-    setMessage(null);
-  };
 
   const updateShopName = (value) => {
     setShopName(value);
@@ -121,19 +103,19 @@ export default function ShopSettings() {
       delete next.name;
       return next;
     });
-    if (error) setError(null);
-    if (message) setMessage(null);
   };
 
   const handleLogoClick = () => {
-    if (!isEditingShop) return;
     if (logoInputRef.current) {
       logoInputRef.current.click();
     }
   };
 
   const handleLogoChange = (file) => {
-    setLogoFile(file || null);
+    // If no file (e.g. user cancelled dialog), do nothing
+    if (!file) return;
+
+    setLogoFile(file);
     setLogoMeta({ w: null, h: null, error: "" });
     setShopFieldErrors((prev) => {
       if (!prev.logo) return prev;
@@ -141,25 +123,17 @@ export default function ShopSettings() {
       delete next.logo;
       return next;
     });
-    setError(null);
-    setMessage(null);
-
-    if (!file) {
-      // revert to original shop logo if any
-      setLogoPreview(shop?.logo_url || null);
-      return;
-    }
 
     // Basic type/size checks
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-      const msg = t("invalid_image_file");
+      const msg = t("errors.1007");
       setLogoMeta({ w: null, h: null, error: msg });
       setShopFieldErrors((prev) => ({ ...prev, logo: msg }));
       setLogoPreview(null);
       return;
     }
     if (file.size > MAX_BYTES) {
-      const msg = t("logo_too_big");
+      const msg = t("errors.1008");
       setLogoMeta({ w: null, h: null, error: msg });
       setShopFieldErrors((prev) => ({ ...prev, logo: msg }));
       setLogoPreview(null);
@@ -174,7 +148,7 @@ export default function ShopSettings() {
       const w = img.naturalWidth;
       const h = img.naturalHeight;
       if (w > MAX_W || h > MAX_H) {
-        const msg = t("logo_too_large_resolution");
+        const msg = t("errors.1009");
         setLogoMeta({ w, h, error: msg });
         setShopFieldErrors((prev) => ({ ...prev, logo: msg }));
       } else {
@@ -183,7 +157,7 @@ export default function ShopSettings() {
       URL.revokeObjectURL(url);
     };
     img.onerror = () => {
-      const msg = t("invalid_image_file");
+      const msg = t("errors.1007");
       setLogoMeta({ w: null, h: null, error: msg });
       setShopFieldErrors((prev) => ({ ...prev, logo: msg }));
       URL.revokeObjectURL(url);
@@ -191,26 +165,55 @@ export default function ShopSettings() {
     img.src = url;
   };
 
+  const handleLogoClear = () => {
+    // Clear selected file and meta, restore original logo from shop
+    setLogoFile(null);
+    setLogoMeta({ w: null, h: null, error: "" });
+    setLogoPreview(shop?.logo_url || null);
+    setShopFieldErrors((prev) => {
+      if (!prev.logo) return prev;
+      const next = { ...prev };
+      delete next.logo;
+      return next;
+    });
+  };
+
+  const playSoundPreview = (key) => {
+    try {
+      // Stop previous sound if still playing
+      if (soundRef.current) {
+        soundRef.current.pause();
+        soundRef.current.currentTime = 0;
+      }
+
+      // Create new audio instance
+      const audio = new Audio(`/sounds/${key}.wav`);
+      soundRef.current = audio;
+
+      audio.play().catch(() => {
+        // Autoplay error ignored
+      });
+    } catch (e) {
+      // Do nothing
+    }
+  };
+
   const saveShop = async () => {
     if (!isShopDirty()) return;
 
     setSavingShop(true);
-    setMessage(null);
-    setError(null);
     setShopFieldErrors({});
 
     const trimmedName = shopName.trim();
 
     if (!trimmedName) {
-      const msg = t("errors.1001") || t("shop_name_required");
+      const msg = t("errors.1001");
       setShopFieldErrors({ name: msg });
-      setError(msg);
       setSavingShop(false);
       return;
     }
 
     if (logoMeta.error) {
-      setError(logoMeta.error);
       setShopFieldErrors((prev) => ({ ...prev, logo: logoMeta.error }));
       setSavingShop(false);
       return;
@@ -251,36 +254,22 @@ export default function ShopSettings() {
         setLogoPreview(updatedShop.logo_url || logoPreview);
         setLogoFile(null);
         setLogoMeta({ w: null, h: null, error: "" });
-        setSoundKey(updatedShop.sound_key || "ding");
+        setSoundKey(updatedShop.sound_key || "happy-bell");
         setTimezone(
           updatedShop.timezone ||
             Intl.DateTimeFormat().resolvedOptions().timeZone ||
             "Asia/Bangkok"
         );
 
-        const msgKey = data.message ? `errors.${data.message}` : null;
-        if (msgKey && t(msgKey) !== msgKey) {
-          setMessage(t(msgKey));
-        } else {
-          setMessage(t("shop_saved") || "Shop updated");
-        }
+        showToast({ type: "success", message: t("shop_saved") });
 
-        setIsEditingShop(false);
         setSavingShop(false);
         return;
       }
-
-      // 2xx but success=false
-      if (data?.message) {
-        const key = `errors.${data.message}`;
-        const translated = t(key) !== key ? t(key) : data.message;
-        setError(translated);
-      } else {
-        setError(t("errors.9000") || "Unexpected error");
-      }
     } catch (err) {
+      console.log(err);
       if (!err.response) {
-        setError(getGlobalErrorFromAxios(err, t));
+        showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
         setSavingShop(false);
         return;
       }
@@ -291,20 +280,14 @@ export default function ShopSettings() {
       if (status === 422 && data?.errors && typeof data.errors === "object") {
         const fe = mapFieldValidationErrors(data.errors, t);
         setShopFieldErrors(fe);
-
-        const globalMsg = getGlobalErrorFromAxios(err, t, {
-          defaultValidationCode: 1000,
-        });
-        setError(globalMsg);
         setSavingShop(false);
         return;
       }
 
       if (data?.message) {
-        const msg = getGlobalErrorFromAxios(err, t);
-        setError(msg);
+        showToast({ type: "error", message: data?.mesaage });
       } else {
-        setError(getGlobalErrorFromAxios(err, t));
+        showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
       }
     } finally {
       setSavingShop(false);
@@ -312,80 +295,55 @@ export default function ShopSettings() {
   };
 
   // ---- Invite Staff helpers ----
-  const updateNewName = (value) => {
-    setNewName(value);
+  const updateInviteName = (value) => {
+    setInviteName(value);
     setInviteFieldErrors((prev) => {
       if (!prev.name) return prev;
       const next = { ...prev };
       delete next.name;
       return next;
     });
-    if (error) setError(null);
-    if (message) setMessage(null);
   };
 
-  const updateNewEmail = (value) => {
-    setNewEmail(value);
+  const updateInviteEmail = (value) => {
+    setInviteEmail(value);
     setInviteFieldErrors((prev) => {
       if (!prev.email) return prev;
       const next = { ...prev };
       delete next.email;
       return next;
     });
-    if (error) setError(null);
-    if (message) setMessage(null);
   };
 
   const handleInviteSubmit = async (e) => {
     e.preventDefault();
-    if (!newEmail.trim()) return;
+    if (!inviteEmail.trim()) return;
 
-    setMessage(null);
-    setError(null);
     setInviteFieldErrors({});
     setInviting(true);
 
-    // optional quick client-side check
-    if (!/\S+@\S+\.\S+/.test(newEmail)) {
-      const msg = t("invalid_email");
-      setInviteFieldErrors((prev) => ({ ...prev, email: msg }));
-      setError(t("errors.1000") || msg);
-      setInviting(false);
-      return;
-    }
-
     try {
       const res = await api.post("/staff/invite", {
-        email: newEmail.trim(),
-        name: newName.trim() || null,
+        email: inviteEmail.trim(),
+        name: inviteName.trim() || null,
       });
 
       const data = res.data;
 
       if (data?.success) {
-        if (data.message === "INVITE_SENT") {
-          setMessage(t("invite_sent"));
-        } else if (data.message === "STAFF_ALREADY_EXISTS") {
-          setMessage(t("staff_already_exists") || t("invite_sent"));
+        if (data.message === "STAFF_ALREADY_EXISTS") {
+          showToast({ type: "success", message: t("staff_already_exists") });
         } else {
-          setMessage(t("invite_sent"));
+          showToast({ type: "success", message: t("invite_sent") });
         }
-        setNewEmail("");
-        setNewName("");
+        setInviteEmail("");
+        setInviteName("");
         setInviting(false);
         return;
       }
-
-      if (data?.message) {
-        const key = `errors.${data.message}`;
-        const translated = t(key) !== key ? t(key) : data.message;
-        setError(translated);
-      } else {
-        setError(t("errors.9000") || "Unexpected error");
-      }
     } catch (err) {
       if (!err.response) {
-        setError(getGlobalErrorFromAxios(err, t));
+        showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
         setInviting(false);
         return;
       }
@@ -399,16 +357,14 @@ export default function ShopSettings() {
         const globalMsg = getGlobalErrorFromAxios(err, t, {
           defaultValidationCode: 1000,
         });
-        setError(globalMsg);
         setInviting(false);
         return;
       }
 
       if (data?.message) {
-        const msg = getGlobalErrorFromAxios(err, t);
-        setError(msg);
+        showToast({ type: "error", message: data?.message });
       } else {
-        setError(getGlobalErrorFromAxios(err, t));
+        showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
       }
     } finally {
       setInviting(false);
@@ -416,60 +372,57 @@ export default function ShopSettings() {
   };
 
   const resendInvite = async (email) => {
-    setMessage(null);
-    setError(null);
-
     try {
       const res = await api.post("/staff/invite/resend", { email });
       const data = res.data;
 
+      console.log(data);
+
       if (data?.success) {
-        setMessage(t("invite_resent"));
+        showToast({ type: "success", message: t("invite_resent") });
         return;
       }
-
-      if (data?.message) {
-        const key = `errors.${data.message}`;
-        const translated = t(key) !== key ? t(key) : data.message;
-        setError(translated);
-      } else {
-        setError(t("errors.9000") || "Unexpected error");
-      }
     } catch (err) {
-      setError(getGlobalErrorFromAxios(err, t));
+      showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
     }
   };
 
   const resetStaffPassword = async (email) => {
-    setMessage(null);
-    setError(null);
-
     try {
       const res = await api.post("/staff/forgot", { email });
       const data = res.data;
 
       if (data?.success) {
-        setMessage(t("reset_link_sent"));
+        showToast({ type: "success", message: t("reset_link_sent") });
         return;
       }
+    } catch (err) {
+      showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
+    }
+  };
 
-      if (data?.message) {
-        const key = `errors.${data.message}`;
-        const translated = t(key) !== key ? t(key) : data.message;
-        setError(translated);
-      } else {
-        setError(t("errors.9000") || "Unexpected error");
+  const activateStaff = async (id) => {
+    if (!confirm(t("confirm_deactivate"))) return;
+    try {
+      const res = await api.post(`/staff/${id}/activate`);
+      const data = res.data;
+
+      if (data?.success) {
+        setStaffs((prev) =>
+          prev.map((s) =>
+            s.kind === "staff" && s.id === id ? { ...s, is_active: 1 } : s
+          )
+        );
+        showToast({ type: "success", message: t("staff_activated") });
+        return;
       }
     } catch (err) {
-      setError(getGlobalErrorFromAxios(err, t));
+      showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
     }
   };
 
   const deactivateStaff = async (id) => {
     if (!confirm(t("confirm_deactivate"))) return;
-    setMessage(null);
-    setError(null);
-
     try {
       const res = await api.post(`/staff/${id}/deactivate`);
       const data = res.data;
@@ -480,28 +433,16 @@ export default function ShopSettings() {
             s.kind === "staff" && s.id === id ? { ...s, is_active: 0 } : s
           )
         );
-        setMessage(t("staff_deactivated"));
+        showToast({ type: "warning", message: t("staff_deactivated") });
         return;
       }
-
-      if (data?.message) {
-        const key = `errors.${data.message}`;
-        const translated = t(key) !== key ? t(key) : data.message;
-        setError(translated);
-      } else {
-        setError(t("errors.9000") || "Unexpected error");
-      }
     } catch (err) {
-      setError(getGlobalErrorFromAxios(err, t));
+      showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
     }
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] text-gray-600">
-        {t("loading")}
-      </div>
-    );
+    return <LoadingSpinner fullscreen={true} label={t("loading")} />;
   }
 
   const getBaseTimezone = () =>
@@ -537,54 +478,27 @@ export default function ShopSettings() {
         <div className="mt-4 bg-white rounded-xl shadow p-4">
           {/* Shop name row */}
           <div className="mb-4">
-            <div className="flex flex-row items-center">
-              <label className="text-xs font-medium text-gray-500 mr-1">
-                {t("shop_name")}
-              </label>
-              {isEditingShop ? (
-                <button
-                  type="button"
-                  onClick={cancelEditShop}
-                  title={t("cancel")}
-                  className="p-2 rounded-md hover:bg-gray-100 text-gray-600 hover:text-black transition"
-                >
-                  <CancelIcon size={18} />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={startEditShop}
-                  title={t("edit")}
-                  className="p-2 rounded-md hover:bg-gray-100 text-blue-600 hover:text-black transition"
-                >
-                  <EditIcon size={18} />
-                </button>
-              )}
-            </div>
+            <label className="text-xs font-medium text-gray-500">
+              {t("shop_name")}
+            </label>
 
-            <div className="flex items-center gap-2">
-              {isEditingShop ? (
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    className={`border rounded p-2 ${
-                      shopFieldErrors.name ? "border-red-500" : ""
-                    }`}
-                    value={shopName}
-                    onChange={(e) => updateShopName(e.target.value)}
-                  />
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  className={`border rounded p-2 ${
+                    shopFieldErrors.name ? "border-red-500" : ""
+                  }`}
+                  value={shopName}
+                  onChange={(e) => updateShopName(e.target.value)}
+                />
 
-                  {shopFieldErrors.name && (
-                    <div className="mt-1 text-xs text-red-600">
-                      {shopFieldErrors.name}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex-1 text-gray-800 font-medium">
-                  {shop.name}
-                </div>
-              )}
+                {shopFieldErrors.name && (
+                  <div className="mt-1 text-xs text-red-600">
+                    {shopFieldErrors.name}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -594,11 +508,9 @@ export default function ShopSettings() {
               {t("shop_logo")}
             </label>
 
-            <div className="flex items-start gap-4">
-              <div
-                className="relative w-24 h-24 border rounded overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer"
-                onClick={handleLogoClick}
-              >
+            <div className="relative w-24 h-24 border rounded overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer">
+              {/* Preview */}
+              <div className="w-full h-full" onClick={handleLogoClick}>
                 {logoPreview ? (
                   <img
                     src={logoPreview}
@@ -606,47 +518,64 @@ export default function ShopSettings() {
                     className="w-full h-full object-contain"
                   />
                 ) : (
-                  <span className="text-xs text-gray-400">
-                    {t("no_logo") || "No logo"}
+                  <span className="text-xs text-gray-400 flex items-center justify-center h-full">
+                    {"Logo"}
                   </span>
                 )}
-
-                <div className="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 flex items-center justify-center text-white text-xs transition">
-                  <EditIcon size={18} />
-                </div>
-
-                <input
-                  ref={logoInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg"
-                  className="hidden"
-                  onChange={(e) =>
-                    handleLogoChange(e.target.files?.[0] || null)
-                  }
-                />
               </div>
 
-              <div className="flex-1 text-xs text-gray-600">
-                <div className="font-medium">
-                  {t("logo_requirements_title")}
-                </div>
-                <ul className="mt-1 list-disc pl-4 space-y-0.5">
-                  <li>{t("logo_req_size")}</li>
-                  <li>{t("logo_req_resolution")}</li>
-                  <li>{t("logo_req_types")}</li>
-                </ul>
+              {/* Hover overlay: edit + cancel (cancel only when new logo selected) */}
+              <div className="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 flex items-center justify-center text-white text-xs transition">
+                <button
+                  type="button"
+                  onClick={handleLogoClick}
+                  className="flex items-center gap-1 px-2 py-1 rounded mr-1"
+                >
+                  <EditIcon size={14} />
+                </button>
 
-                {logoMeta.w && logoMeta.h && !logoMeta.error && (
-                  <div className="mt-1 text-gray-500">
-                    {t("preview")} ({logoMeta.w}×{logoMeta.h}px)
-                  </div>
-                )}
-                {(logoMeta.error || shopFieldErrors.logo) && (
-                  <div className="mt-1 text-xs text-red-600">
-                    {shopFieldErrors.logo || logoMeta.error}
-                  </div>
+                {logoFile && (
+                  <button
+                    type="button"
+                    onClick={handleLogoClear}
+                    className="flex items-center gap-1 px-2 py-1 rounded ml-1"
+                  >
+                    <CancelIcon size={14} />
+                  </button>
                 )}
               </div>
+
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/png,image/jpeg"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  handleLogoChange(file || null);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+
+            <div className="flex-1 text-xs text-gray-400 mt-2">
+              <div className="font-medium">{t("logo_requirements_title")}</div>
+              <ul className="mt-1 list-disc pl-4 space-y-0.5">
+                <li>{t("logo_req_size")}</li>
+                <li>{t("logo_req_resolution")}</li>
+                <li>{t("logo_req_types")}</li>
+              </ul>
+
+              {logoMeta.w && logoMeta.h && !logoMeta.error && (
+                <div className="mt-1 text-gray-400">
+                  {t("preview")} ({logoMeta.w}×{logoMeta.h}px)
+                </div>
+              )}
+              {(logoMeta.error || shopFieldErrors.logo) && (
+                <div className="mt-1 text-xs text-red-600">
+                  {shopFieldErrors.logo || logoMeta.error}
+                </div>
+              )}
             </div>
           </div>
 
@@ -658,7 +587,11 @@ export default function ShopSettings() {
             <select
               className="border p-2 rounded"
               value={soundKey}
-              onChange={(e) => setSoundKey(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSoundKey(value);
+                playSoundPreview(value); // 🔊 play preview
+              }}
             >
               {SOUND_KEYS.map((key) => {
                 const labelKey = `sound_options.${key}`;
@@ -695,7 +628,7 @@ export default function ShopSettings() {
           </div>
 
           {/* Save button */}
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex justify-start">
             <button
               type="button"
               onClick={saveShop}
@@ -705,17 +638,6 @@ export default function ShopSettings() {
               {t("save_changes") || t("save")}
             </button>
           </div>
-        </div>
-      )}
-
-      {message && (
-        <div className="mt-4 bg-green-50 border border-green-300 text-green-800 p-3 rounded">
-          {message}
-        </div>
-      )}
-      {error && (
-        <div className="mt-4 bg-red-50 border border-red-300 text-red-800 p-3 rounded">
-          {error}
         </div>
       )}
 
@@ -733,8 +655,8 @@ export default function ShopSettings() {
                 inviteFieldErrors.name ? "border-red-500" : ""
               }`}
               placeholder={t("staff_name")}
-              value={newName}
-              onChange={(e) => updateNewName(e.target.value)}
+              value={inviteName}
+              onChange={(e) => updateInviteName(e.target.value)}
             />
             {inviteFieldErrors.name && (
               <div className="mt-1 text-xs text-red-600">
@@ -750,8 +672,8 @@ export default function ShopSettings() {
                 inviteFieldErrors.email ? "border-red-500" : ""
               }`}
               placeholder={t("staff_email")}
-              value={newEmail}
-              onChange={(e) => updateNewEmail(e.target.value)}
+              value={inviteEmail}
+              onChange={(e) => updateInviteEmail(e.target.value)}
               required
             />
             {inviteFieldErrors.email && (
@@ -763,7 +685,7 @@ export default function ShopSettings() {
 
           <button
             type="submit"
-            disabled={!newEmail.trim() || inviting}
+            disabled={!inviteEmail.trim() || inviting}
             className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 disabled:opacity-50"
           >
             {t("send_invite")}
@@ -819,24 +741,32 @@ export default function ShopSettings() {
                         </button>
                       )}
 
-                      {/* Real staff → reset password / deactivate */}
-                      {!isInvite && s.is_active && (
-                        <button
-                          onClick={() => resetStaffPassword(s.email)}
-                          className="text-xs underline text-blue-600"
-                        >
-                          {t("reset_password")}
-                        </button>
-                      )}
+                      {/* Real staff → reset password / deactivate OR activate */}
+                      {!isInvite &&
+                        (s.is_active ? (
+                          <>
+                            <button
+                              onClick={() => resetStaffPassword(s.email)}
+                              className="text-xs underline text-blue-600"
+                            >
+                              {t("reset_password")}
+                            </button>
 
-                      {!isInvite && (
-                        <button
-                          onClick={() => deactivateStaff(s.id)}
-                          className="text-xs underline text-red-600"
-                        >
-                          {t("deactivate")}
-                        </button>
-                      )}
+                            <button
+                              onClick={() => deactivateStaff(s.id)}
+                              className="text-xs underline text-red-600"
+                            >
+                              {t("deactivate")}
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => activateStaff(s.id)}
+                            className="text-xs underline text-green-600"
+                          >
+                            {t("activate")}
+                          </button>
+                        ))}
                     </td>
                   </tr>
                 );

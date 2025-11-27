@@ -35,7 +35,7 @@ class StaffPasswordResetController extends Controller
         }
 
         // Always OK to avoid account enumeration
-        return response()->json(['message' => 'OK'], 200);
+        return response()->json(['success' => true, 'message' => 'OK'], 200);
     }
 
     // PUBLIC: staff submits new password with token

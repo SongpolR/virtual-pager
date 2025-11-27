@@ -74,7 +74,7 @@ class AuthController extends Controller
           'owner_id'   => $ownerId,
           'name'       => $req->shop_name,
           'logo_url'   => $logoUrl,
-          'sound_key'  => 'ding',
+          'sound_key'  => 'happy-bell',
           'created_at' => now(),
           'updated_at' => now(),
         ]);

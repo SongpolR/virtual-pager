@@ -1,15 +1,14 @@
 // web/src/components/SessionExpiredModal.jsx
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 function SessionExpiredModal({ open }) {
+  const { t } = useTranslation("common");
   if (!open) return null;
 
   const handleOk = () => {
-    // เผื่อมีอะไรตกค้าง
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    // redirect กลับหน้า login
     window.location.href = "/login";
   };
 
@@ -20,9 +19,12 @@ function SessionExpiredModal({ open }) {
       role="dialog"
     >
       <div className="bg-white rounded-lg shadow-lg max-w-sm w-full mx-4 p-6">
-        <h2 className="text-lg font-semibold mb-3">Session expired</h2>
+        <h2 className="text-lg font-semibold mb-3">
+          {t("session_expired_title")}
+        </h2>
+
         <p className="text-sm text-gray-700 mb-6">
-          Your session has expired. Please log in again to continue.
+          {t("session_expired_message")}
         </p>
 
         <div className="flex justify-end">
@@ -31,7 +33,7 @@ function SessionExpiredModal({ open }) {
             onClick={handleOk}
             className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
           >
-            OK
+            {t("ok")}
           </button>
         </div>
       </div>

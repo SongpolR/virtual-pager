@@ -8,6 +8,7 @@ import {
   mapFieldValidationErrors,
   getGlobalErrorFromAxios,
 } from "../lib/errorHelpers";
+import { useNavigate } from "react-router-dom";
 
 const pwOk = (pw) => ({
   length: pw.length >= 8,
@@ -38,6 +39,7 @@ export default function StaffSetup() {
     checks.number &&
     checks.allowed;
   const match = password && confirm && password === confirm;
+  const navigate = useNavigate();
 
   const clearErrors = () => {
     if (submitErr) setSubmitErr("");
@@ -109,7 +111,7 @@ export default function StaffSetup() {
           localStorage.setItem("tokenType", "staff");
         }
         // Staff main area → same Orders page as owner
-        location.href = "/";
+        navigate("/", { replace: true });
         return;
       }
 

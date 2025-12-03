@@ -52,11 +52,11 @@ export function mapFieldValidationErrors(apiErrors, t, fallbackCode = 1000) {
       code = first;
     }
 
-    const key = `errors.${code}`;
+    const key = `common:errors.${code}`;
     const translated =
       t(key, meta) !== key
         ? t(key, meta)
-        : t(`errors.${fallbackCode}`) || "Invalid value";
+        : t(`common:errors.${fallbackCode}`) || "Invalid value";
 
     fieldErrors[field] = translated;
   });
@@ -81,7 +81,7 @@ export function getGlobalErrorFromAxios(err, t, options = {}) {
 
   if (!err.response) {
     // Network error / no response
-    const key = `errors.${defaultNetworkCode}`;
+    const key = `common:errors.${defaultNetworkCode}`;
     return t(key) !== key ? t(key) : "Network error";
   }
 
@@ -89,17 +89,17 @@ export function getGlobalErrorFromAxios(err, t, options = {}) {
 
   // Validation (422) – caller can choose to show generic validation message
   if (status === 422) {
-    const key = `errors.${defaultValidationCode}`;
+    const key = `common:errors.${defaultValidationCode}`;
     return t(key) !== key ? t(key) : "";
   }
 
   // If backend uses "message" as a code (e.g. SESSION_EXPIRED, INVALID_CREDENTIAL)
   if (data?.message) {
-    const key = `errors.${data.message}`;
+    const key = `common:errors.${data.message}`;
     if (t(key) !== key) return t(key);
   }
 
   // Fallback: generic unknown
-  const key = `errors.${defaultUnknownCode}`;
+  const key = `common:errors.${defaultUnknownCode}`;
   return t(key) !== key ? t(key) : "Unexpected error";
 }

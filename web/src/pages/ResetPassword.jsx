@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function ResetPassword() {
   const params = new URLSearchParams(location.search);
@@ -11,9 +12,9 @@ export default function ResetPassword() {
         <p className="mt-2 text-sm">
           This page will be implemented in the next step.
         </p>
-        <a className="underline mt-4 inline-block" href="/login">
+        <Link className="underline mt-4 inline-block" to="/login">
           Back to Login
-        </a>
+        </Link>
       </div>
     </div>
   );

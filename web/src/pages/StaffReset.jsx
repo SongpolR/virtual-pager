@@ -8,6 +8,7 @@ import {
   mapFieldValidationErrors,
   getGlobalErrorFromAxios,
 } from "../lib/errorHelpers";
+import { useNavigate } from "react-router-dom";
 
 const pwOk = (pw) => ({
   length: pw.length >= 8,
@@ -39,6 +40,7 @@ export default function StaffReset() {
     checks.number &&
     checks.allowed;
   const match = password && confirm && password === confirm;
+  const navigate = useNavigate();
 
   const clearStatusAndErrors = () => {
     if (resetStatus) setResetStatus(null);
@@ -101,7 +103,7 @@ export default function StaffReset() {
 
       if (data?.success) {
         // success → show green message; user can go back to login
-        location.href = "/";
+        navigate("/", { replace: true });
         setSubmitting(false);
         return;
       }
@@ -253,12 +255,12 @@ export default function StaffReset() {
         </button>
 
         {resetStatus === "ok" && (
-          <a
+          <Link
             className="mt-3 inline-block underline text-sm"
-            href={`/login?mode=staff&email=${encodeURIComponent(email)}`}
+            to={`/login?mode=staff&email=${encodeURIComponent(email)}`}
           >
             {t("continue_login")}
-          </a>
+          </Link>
         )}
       </form>
     </div>

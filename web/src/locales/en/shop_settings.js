@@ -4,16 +4,7 @@ const shop_settings = {
   shop_logo: "Shop Logo",
   shop_sound_key: "Notify Sound",
   shop_update: "Update Shop",
-  shop_update_success: "Shop information updated successfully.",
-  shop_name_label: "Shop Name",
-  order_numbering_mode: "Order numbering mode",
-  numbering_sequential: "Sequential (resets daily)",
-  numbering_random: "Random",
-  customer_sound: "Customer notification sound",
   save_changes: "Save Changes",
-  delete_shop: "Delete Shop",
-  delete_shop_confirm:
-    "Are you sure you want to delete this shop? This action cannot be undone.",
   shop_saved: "Shop information updated successfully",
 
   // Staff management section
@@ -31,6 +22,18 @@ const shop_settings = {
   confirm_deactivate: "Are you sure you want to deactivate this staff?",
   no_staff: "No staff members found.",
   staff_status_invited: "Invited (pending)",
+
+  sound_options: {
+    arcade: "Arcade",
+    fairy: "Fairy",
+    flute: "Flute",
+    game: "Game",
+    happy_bell: "Happy Bell",
+    marimba: "Marimba",
+    slot_machine: "Slot Machine",
+    toy_telephone: "Toy Telephone",
+    urgent: "Urgent",
+  },
 };
 
 export default shop_settings;

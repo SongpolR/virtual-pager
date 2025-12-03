@@ -37,7 +37,7 @@ const TIMEZONES = [
 ];
 
 export default function ShopSettings() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["shop_settings"]);
 
   const [shop, setShop] = useState(null);
 
@@ -559,11 +559,13 @@ export default function ShopSettings() {
             </div>
 
             <div className="flex-1 text-xs text-gray-400 mt-2">
-              <div className="font-medium">{t("logo_requirements_title")}</div>
+              <div className="font-medium">
+                {t("common:logo_requirements_title")}
+              </div>
               <ul className="mt-1 list-disc pl-4 space-y-0.5">
-                <li>{t("logo_req_size")}</li>
-                <li>{t("logo_req_resolution")}</li>
-                <li>{t("logo_req_types")}</li>
+                <li>{t("common:logo_req_size")}</li>
+                <li>{t("common:logo_req_resolution")}</li>
+                <li>{t("common:logo_req_types")}</li>
               </ul>
 
               {logoMeta.w && logoMeta.h && !logoMeta.error && (
@@ -594,7 +596,7 @@ export default function ShopSettings() {
               }}
             >
               {SOUND_KEYS.map((key) => {
-                const labelKey = `sound_options.${key}`;
+                const labelKey = `sound_options.${key.replace("-", "_")}`;
                 const label = t(labelKey) !== labelKey ? t(labelKey) : key;
                 return (
                   <option key={key} value={key}>

@@ -20,6 +20,16 @@ const common = {
   email_address: "Email address",
   close: "Close",
   remove: "Remove",
+  shop_name: "Shop Name",
+  shop_logo: "Shop Logo",
+  logo_requirements_title: "Logo requirements",
+  logo_req_size: "File size ≤ 2 MB",
+  logo_req_resolution: "Resolution ≤ 1024×1024 px",
+  logo_req_types: "PNG / JPG / JPEG",
+  session_expired_title: "Session expired",
+  session_expired_message:
+    "Your session has expired. Please log in again to continue.",
+  ok: "OK",
 
   menu: {
     order_menu: "Order",

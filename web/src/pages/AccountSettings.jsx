@@ -1,15 +1,17 @@
 // web/src/pages/AccountSettings.jsx
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 export default function AccountSettings() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("account");
   const role = localStorage.getItem("tokenType") || "staff"; // fallback
+  const navigate = useNavigate();
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("tokenType");
-    location.href = "/login";
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -47,7 +49,7 @@ export default function AccountSettings() {
             className="inline-flex items-center justify-center bg-red-500 text-white rounded-md px-3 py-2 text-sm hover:bg-gray-900"
             onClick={logout}
           >
-            {t("logout")}
+            {t("common:logout")}
           </button>
         </div>
       </div>

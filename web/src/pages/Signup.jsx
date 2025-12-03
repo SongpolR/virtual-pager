@@ -7,6 +7,9 @@ import {
   mapFieldValidationErrors,
   getGlobalErrorFromAxios,
 } from "../lib/errorHelpers";
+import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
+import { useToast } from "../components/ToastProvider";
+import { useNavigate, Link } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
@@ -16,7 +19,7 @@ const MAX_W = 1024;
 const MAX_H = 1024;
 
 export default function Signup() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("auth");
   const params = new URLSearchParams(location.search);
   const initialEmail = params.get("email") || "";
   const [form, setForm] = useState({
@@ -29,8 +32,9 @@ export default function Signup() {
   const [logo, setLogo] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoMeta, setLogoMeta] = useState({ w: null, h: null, error: "" });
-  const [submitErr, setSubmitErr] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
+  const { showToast } = useToast();
+  const navigate = useNavigate();
 
   // Password live checks
   const pw = form.password || "";
@@ -107,25 +111,7 @@ export default function Signup() {
         if (payload?.token) {
           localStorage.setItem("token", payload.token);
           localStorage.setItem("tokenType", "owner");
-          location.href = "/";
-        } else if (payload?.errors) {
-          alert(payload.errors.map((code) => t(`errors.${code}`)).join("\n"));
-        } else {
-          alert(t("errors.9000"));
-        }
-      }
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, [t]);
-
-  useEffect(() => {
-    const handler = (ev) => {
-      if (ev.data?.type === "google-auth-result") {
-        const { payload } = ev.data;
-        if (payload?.token) {
-          localStorage.setItem("token", payload.token);
-          location.href = "/";
+          navigate("/", { replace: true });
         } else if (payload?.errors) {
           alert(payload.errors.map((code) => t(`errors.${code}`)).join("\n"));
         } else {
@@ -157,19 +143,15 @@ export default function Signup() {
       delete next[field];
       return next;
     });
-
-    // Clear global submit error
-    if (submitErr) setSubmitErr("");
   };
 
   const submit = async (e) => {
     e.preventDefault();
-    setSubmitErr("");
     setFieldErrors({});
 
     const v = validateBeforeSubmit();
     if (v) {
-      setSubmitErr(v);
+      showToast({ type: "error", message: v });
       return;
     }
 
@@ -194,22 +176,18 @@ export default function Signup() {
         // You can show a success toast using messages.SIGNUP_SUCCESS_NEED_VERIFY if you want
         // const msgKey = `messages.${data.message}`;
         // toast(t(msgKey) !== msgKey ? t(msgKey) : t("messages.SIGNUP_SUCCESS_NEED_VERIFY"));
-        location.href = "/login";
+        showToast({
+          type: "success",
+          message: t("signup_success"),
+          duration: 10000,
+        });
+        navigate("/login", { replace: true });
         return;
-      }
-
-      // 2xx but success=false (rare)
-      if (data?.message) {
-        const key = `errors.${data.message}`;
-        const translated = t(key) !== key ? t(key) : data.message;
-        setSubmitErr(translated);
-      } else {
-        setSubmitErr(t("errors.9000") || "Unexpected error");
       }
     } catch (err) {
       if (!err.response) {
         // network or unknown
-        setSubmitErr(getGlobalErrorFromAxios(err, t));
+        showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
         return;
       }
 
@@ -224,219 +202,216 @@ export default function Signup() {
         const globalMsg = getGlobalErrorFromAxios(err, t, {
           defaultValidationCode: 1000,
         });
-        setSubmitErr(globalMsg);
+        showToast({ type: "error", message: globalMsg });
         return;
       }
 
       // Non-validation error with message as code
-      setSubmitErr(getGlobalErrorFromAxios(err, t));
+      showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
     }
   };
 
   return (
-    <div className="min-h-screen relative">
-      <div className="min-h-screen flex items-center justify-center">
-        <form
-          onSubmit={submit}
-          className="bg-white p-6 rounded-xl shadow w-[420px]"
-        >
+    <div className="min-h-screen w-full relative bg-gray-50 flex items-center justify-center p-4">
+      <form
+        onSubmit={submit}
+        className="bg-white shadow-xl rounded-2xl w-full max-w-md p-4"
+      >
+        <div className="flex flex-row items-center justify-between">
           <h1 className="text-xl font-semibold">{t("create_account")}</h1>
+          <LanguageSwitcher />
+        </div>
 
-          {/* Shop name */}
-          <label className="block mt-4 text-sm">{t("shop_name")}</label>
-          <input
-            className={`border p-2 rounded w-full ${
-              fieldErrors.shop_name ? "border-red-500" : ""
-            }`}
-            value={form.shop_name}
-            onChange={(e) => updateField("shop_name", e.target.value)}
-            required
-          />
-          {fieldErrors.shop_name && (
-            <div className="mt-1 text-xs text-red-600">
-              {fieldErrors.shop_name}
-            </div>
-          )}
-
-          {/* Shop logo with preview + bullets */}
-          <label className="block mt-4 text-sm">{t("shop_logo")}</label>
-          <input
-            type="file"
-            accept="image/png,image/jpeg"
-            onChange={(e) => {
-              setLogo(e.target.files?.[0] || null);
-
-              // Clear field error for "logo"
-              setFieldErrors((prev) => {
-                if (!prev.logo) return prev;
-                const next = { ...prev };
-                delete next.logo;
-                return next;
-              });
-
-              if (submitErr) setSubmitErr("");
-            }}
-            required
-          />
-          <div className="mt-2">
-            <div className="text-xs text-gray-500 font-medium">
-              {t("logo_requirements_title")}
-            </div>
-            <ul className="mt-1 text-xs text-gray-500 list-disc pl-5">
-              <li>{t("logo_req_size")}</li>
-              <li>{t("logo_req_resolution")}</li>
-              <li>{t("logo_req_types")}</li>
-            </ul>
+        {/* Shop name */}
+        <label className="block mt-4 text-sm">{t("common:shop_name")}</label>
+        <input
+          className={`border p-2 rounded w-full ${
+            fieldErrors.shop_name ? "border-red-500" : ""
+          }`}
+          value={form.shop_name}
+          onChange={(e) => updateField("shop_name", e.target.value)}
+          required
+        />
+        {fieldErrors.shop_name && (
+          <div className="mt-1 text-xs text-red-600">
+            {fieldErrors.shop_name}
           </div>
+        )}
 
-          {logoPreview && (
-            <div className="mt-3">
-              <div className="text-xs text-gray-600 mb-1">
-                {t("preview")}{" "}
-                {logoMeta.w && logoMeta.h
-                  ? `(${logoMeta.w}×${logoMeta.h}px)`
-                  : ""}
-              </div>
-              <img
-                src={logoPreview}
-                alt="logo preview"
-                className="h-20 w-auto rounded border"
-              />
-            </div>
-          )}
-          {logoMeta.error && (
-            <div className="mt-2 text-xs text-red-600">{logoMeta.error}</div>
-          )}
-          {fieldErrors.logo && (
-            <div className="mt-1 text-xs text-red-600">{fieldErrors.logo}</div>
-          )}
+        {/* Shop logo with preview + bullets */}
+        <label className="block mt-4 text-sm">{t("common:shop_logo")}</label>
+        <input
+          className={"border p-2 rounded w-full"}
+          type="file"
+          accept="image/png,image/jpeg"
+          onChange={(e) => {
+            setLogo(e.target.files?.[0] || null);
 
-          {/* Your name */}
-          <label className="block mt-4 text-sm">{t("your_name")}</label>
-          <input
-            className={`border p-2 rounded w-full ${
-              fieldErrors.name ? "border-red-500" : ""
-            }`}
-            value={form.name}
-            onChange={(e) => updateField("name", e.target.value)}
-            required
-          />
-          {fieldErrors.name && (
-            <div className="mt-1 text-xs text-red-600">{fieldErrors.name}</div>
-          )}
-
-          {/* Email */}
-          <label className="block mt-4 text-sm">{t("email")}</label>
-          <input
-            type="email"
-            className={`border p-2 rounded w-full ${
-              fieldErrors.email ? "border-red-500" : ""
-            }`}
-            value={form.email}
-            onChange={(e) => updateField("email", e.target.value)}
-            required
-          />
-          {fieldErrors.email && (
-            <div className="mt-1 text-xs text-red-600">{fieldErrors.email}</div>
-          )}
-
-          {/* Password */}
-          <label className="block mt-4 text-sm">{t("password")}</label>
-          <input
-            type="password"
-            className={`border p-2 rounded w-full ${
-              fieldErrors.password ? "border-red-500" : ""
-            }`}
-            value={form.password}
-            onChange={(e) => updateField("password", e.target.value)}
-            required
-          />
-          {fieldErrors.password && (
-            <div className="mt-1 text-xs text-red-600">
-              {fieldErrors.password}
-            </div>
-          )}
-
-          {/* Confirm Password */}
-          <label className="block mt-4 text-sm">{t("confirm_password")}</label>
-          <input
-            type="password"
-            className={`border p-2 rounded w-full ${
-              fieldErrors.confirm_password ? "border-red-500" : ""
-            }`}
-            value={form.confirm_password}
-            onChange={(e) => updateField("confirm_password", e.target.value)}
-            required
-          />
-          {fieldErrors.confirm_password && (
-            <div className="mt-1 text-xs text-red-600">
-              {fieldErrors.confirm_password}
-            </div>
-          )}
-
-          <div className="mt-2">
-            <div className="text-xs text-gray-500 font-medium">
-              {t("password_requirements_title")}
-            </div>
-            <ul className="mt-1 text-xs list-disc pl-5">
-              <ChecklistItem
-                ok={pwChecks.length}
-                label={t("password_rule_length")}
-              />
-              <ChecklistItem
-                ok={pwChecks.upper}
-                label={t("password_rule_uppercase")}
-              />
-              <ChecklistItem
-                ok={pwChecks.number}
-                label={t("password_rule_number")}
-              />
-              <ChecklistItem
-                ok={pwChecks.allowed}
-                label={t("password_rule_symbol")}
-              />
-              <ChecklistItem ok={pwMatch} label={t("password_rule_match")} />
-            </ul>
+            // Clear field error for "logo"
+            setFieldErrors((prev) => {
+              if (!prev.logo) return prev;
+              const next = { ...prev };
+              delete next.logo;
+              return next;
+            });
+          }}
+          required
+        />
+        <div className="mt-2">
+          <div className="text-xs text-gray-500 font-medium">
+            {t("common:logo_requirements_title")}
           </div>
+          <ul className="mt-1 text-xs text-gray-500 list-disc pl-5">
+            <li>{t("common:logo_req_size")}</li>
+            <li>{t("common:logo_req_resolution")}</li>
+            <li>{t("common:logo_req_types")}</li>
+          </ul>
+        </div>
 
-          {/* Submit error */}
-          {submitErr && (
-            <div className="text-red-600 text-sm mt-3">{submitErr}</div>
-          )}
-
-          {/* Submit */}
-          <button
-            className="mt-4 w-full bg-black text-white rounded py-2 disabled:opacity-50"
-            disabled={
-              !form.shop_name ||
-              !form.name ||
-              !form.email ||
-              !allPwOk ||
-              !pwMatch ||
-              !!logoMeta.error
-            }
-          >
-            {t("signup")}
-          </button>
-
-          <div className="mt-4 text-center text-sm">
-            {t("or_signin")}{" "}
-            <a className="text-blue-600 underline" href="/login">
-              {t("login")}
-            </a>
-            <div className="mt-4 text-center">
-              <button
-                type="button"
-                onClick={loginGoogle}
-                className="flex items-center justify-center w-full gap-2 border border-gray-300 rounded py-2 hover:bg-gray-50 transition-colors"
-              >
-                <GoogleIcon size={18} />
-                <span>{t("sign_in_google")}</span>
-              </button>
+        {logoPreview && (
+          <div className="mt-3">
+            <div className="text-xs text-gray-600 mb-1">
+              {t("preview")}{" "}
+              {logoMeta.w && logoMeta.h
+                ? `(${logoMeta.w}×${logoMeta.h}px)`
+                : ""}
             </div>
+            <img
+              src={logoPreview}
+              alt="logo preview"
+              className="h-20 w-20 rounded border"
+            />
           </div>
-        </form>
-      </div>
+        )}
+        {logoMeta.error && (
+          <div className="mt-2 text-xs text-red-600">{logoMeta.error}</div>
+        )}
+        {fieldErrors.logo && (
+          <div className="mt-1 text-xs text-red-600">{fieldErrors.logo}</div>
+        )}
+
+        {/* Your name */}
+        <label className="block mt-4 text-sm">{t("common:your_name")}</label>
+        <input
+          className={`border p-2 rounded w-full ${
+            fieldErrors.name ? "border-red-500" : ""
+          }`}
+          value={form.name}
+          onChange={(e) => updateField("name", e.target.value)}
+          required
+        />
+        {fieldErrors.name && (
+          <div className="mt-1 text-xs text-red-600">{fieldErrors.name}</div>
+        )}
+
+        {/* Email */}
+        <label className="block mt-4 text-sm">{t("common:email")}</label>
+        <input
+          type="email"
+          className={`border p-2 rounded w-full ${
+            fieldErrors.email ? "border-red-500" : ""
+          }`}
+          value={form.email}
+          onChange={(e) => updateField("email", e.target.value)}
+          required
+        />
+        {fieldErrors.email && (
+          <div className="mt-1 text-xs text-red-600">{fieldErrors.email}</div>
+        )}
+
+        {/* Password */}
+        <label className="block mt-4 text-sm">{t("common:password")}</label>
+        <input
+          type="password"
+          className={`border p-2 rounded w-full ${
+            fieldErrors.password ? "border-red-500" : ""
+          }`}
+          value={form.password}
+          onChange={(e) => updateField("password", e.target.value)}
+          required
+        />
+        {fieldErrors.password && (
+          <div className="mt-1 text-xs text-red-600">
+            {fieldErrors.password}
+          </div>
+        )}
+
+        {/* Confirm Password */}
+        <label className="block mt-4 text-sm">
+          {t("common:confirm_password")}
+        </label>
+        <input
+          type="password"
+          className={`border p-2 rounded w-full ${
+            fieldErrors.confirm_password ? "border-red-500" : ""
+          }`}
+          value={form.confirm_password}
+          onChange={(e) => updateField("confirm_password", e.target.value)}
+          required
+        />
+        {fieldErrors.confirm_password && (
+          <div className="mt-1 text-xs text-red-600">
+            {fieldErrors.confirm_password}
+          </div>
+        )}
+
+        <div className="mt-2">
+          <div className="text-xs text-gray-500 font-medium">
+            {t("password_requirements_title")}
+          </div>
+          <ul className="mt-1 text-xs list-disc pl-5">
+            <ChecklistItem
+              ok={pwChecks.length}
+              label={t("password_rule_length")}
+            />
+            <ChecklistItem
+              ok={pwChecks.upper}
+              label={t("password_rule_uppercase")}
+            />
+            <ChecklistItem
+              ok={pwChecks.number}
+              label={t("password_rule_number")}
+            />
+            <ChecklistItem
+              ok={pwChecks.allowed}
+              label={t("password_rule_symbol")}
+            />
+            <ChecklistItem ok={pwMatch} label={t("password_rule_match")} />
+          </ul>
+        </div>
+
+        {/* Submit */}
+        <button
+          className="mt-4 w-full bg-black text-white rounded py-2 disabled:opacity-50"
+          disabled={
+            !form.shop_name ||
+            !form.name ||
+            !form.email ||
+            !allPwOk ||
+            !pwMatch ||
+            !!logoMeta.error
+          }
+        >
+          {t("signup")}
+        </button>
+
+        <div className="mt-4 text-center text-sm">
+          {t("or_signin")}{" "}
+          <Link to="/login" className="underline text-blue-700">
+            {t("login")}
+          </Link>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={loginGoogle}
+              className="flex items-center justify-center w-full gap-2 border border-gray-300 rounded py-2 hover:bg-gray-50 transition-colors"
+            >
+              <GoogleIcon size={18} />
+              <span>{t("sign_in_google")}</span>
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }

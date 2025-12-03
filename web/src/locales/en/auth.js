@@ -27,11 +27,6 @@ const auth = {
   login_staff_contact_owner: "Please contact your shop owner to continue.",
 
   // Signup
-  logo_requirements_title: "Logo requirements",
-  logo_req_size: "File size ≤ 2 MB",
-  logo_req_resolution: "Resolution ≤ 1024×1024 px",
-  logo_req_types: "PNG / JPG / JPEG",
-
   password_requirements_title: "Password requirements",
   password_rule_uppercase: "At least one uppercase letter",
   password_rule_number: "At least one number",
@@ -41,6 +36,8 @@ const auth = {
   password_confirm: "Confirm Password",
   password_requirements_error: "Password is not match with requirements",
   confirm_password_incorrect: "Confirm password is not match with requirements",
+  signup_success:
+    "Your account has been created successfully. Please verify your email address to complete your registration.",
 
   // Email verification
   verify_email_title: "Verify your email",

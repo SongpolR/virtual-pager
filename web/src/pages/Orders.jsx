@@ -6,6 +6,7 @@ import api from "../lib/api";
 import { useToast } from "../components/ToastProvider";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { getGlobalErrorFromAxios } from "../lib/errorHelpers";
+import { Link } from "react-router-dom";
 
 // Base URL for customer-facing order page
 const CUSTOMER_BASE_URL =
@@ -481,14 +482,14 @@ export default function Orders() {
               className="rounded-md"
             />
             <div className="text-xs text-gray-600 break-all text-center px-1">
-              <a
-                href={qrOrderUrl}
+              <Link
+                to={qrOrderUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[9px] text-gray-400 underline"
               >
                 {qrOrderUrl}
-              </a>
+              </Link>
             </div>
             <button
               onClick={() => setQrModalOpen(false)}
@@ -576,14 +577,14 @@ function OrderColumn({
                       onClick={() => onShowQr && onShowQr(customerUrl)}
                     />
 
-                    <a
-                      href={customerUrl}
+                    <Link
+                      to={customerUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[9px] text-gray-400 underline"
                     >
                       {t("open_customer_page") || "Open page"}
-                    </a>
+                    </Link>
                   </div>
                 </div>
 

@@ -16,7 +16,6 @@ return new class extends Migration {
                 ->unique()
                 ->nullable();
             $table->enum('status', ['pending', 'ready', 'done'])->default('pending');
-            $table->string('status', 20)->default('pending'); // pending | ready | done
 
             $table->json('items')->nullable();       // POS / app-provided items
             $table->string('pos_ref', 100)->nullable(); // external POS order reference

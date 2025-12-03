@@ -1,5 +1,5 @@
 // web/src/pages/Login.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher.jsx";
 import api from "../lib/api";
@@ -8,16 +8,19 @@ import {
   getGlobalErrorFromAxios,
 } from "../lib/errorHelpers";
 import GoogleIcon from "../components/icons/GoogleIcon.jsx";
+import { useToast } from "../components/ToastProvider";
+import { Link, useNavigate } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
 export default function Login() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("auth");
   const [mode, setMode] = useState("owner"); // 'owner' | 'staff'
-  const [errBlock, setErrBlock] = useState(null); // { code, email, mode }
   const [fieldErrors, setFieldErrors] = useState({});
-  const [submitErr, setSubmitErr] = useState("");
   const [form, setForm] = useState({ email: "", password: "" });
+  const [errBlock, setErrBlock] = useState(null);
+  const { showToast } = useToast();
+  const navigate = useNavigate();
 
   // Preselect mode & email via URL params
   useEffect(() => {
@@ -38,7 +41,7 @@ export default function Login() {
         if (payload?.token) {
           localStorage.setItem("token", payload.token);
           localStorage.setItem("tokenType", "owner");
-          location.href = "/";
+          navigate("/", { replace: true });
         } else if (payload?.errors) {
           alert(payload.errors.map((code) => t(`errors.${code}`)).join("\n"));
         } else {
@@ -71,16 +74,13 @@ export default function Login() {
       return next;
     });
 
-    // Clear submit + panel error when user edits fields
-    if (submitErr) setSubmitErr("");
     if (errBlock) setErrBlock(null);
   };
 
   const submit = async (e) => {
     e.preventDefault();
-    setErrBlock(null);
     setFieldErrors({});
-    setSubmitErr("");
+    setErrBlock(null);
 
     const email = form.email.trim();
     const password = form.password;
@@ -97,23 +97,14 @@ export default function Login() {
           localStorage.setItem("token", token);
           localStorage.setItem("tokenType", mode); // 'owner' | 'staff'
           // Shared landing: Orders
-          location.href = "/orders";
+          navigate("/orders", { replace: true });
           return;
         }
-      }
-
-      // 2xx but success=false (rare)
-      if (data?.message) {
-        const key = `errors.${data.message}`;
-        const translated = t(key) !== key ? t(key) : data.message;
-        setSubmitErr(translated);
-      } else {
-        setSubmitErr(t("errors.9000") || "Unexpected error");
       }
     } catch (err) {
       // Network or no response
       if (!err.response) {
-        setSubmitErr(getGlobalErrorFromAxios(err, t));
+        showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
         return;
       }
 
@@ -127,7 +118,7 @@ export default function Login() {
         const globalMsg = getGlobalErrorFromAxios(err, t, {
           defaultValidationCode: 1000,
         });
-        setSubmitErr(globalMsg);
+        showToast({ type: "error", message: globalMsg });
         return;
       }
 
@@ -147,12 +138,12 @@ export default function Login() {
       }
 
       // Fallback
-      setSubmitErr(getGlobalErrorFromAxios(err, t));
+      showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
     }
   };
 
   return (
-    <div className="min-h-screen relative bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen relative bg-gray-50 flex items-center justify-center p-4">
       <LanguageSwitcher className="fixed top-4 right-4" />
 
       <form
@@ -165,8 +156,6 @@ export default function Login() {
             type="button"
             onClick={() => {
               setMode("owner");
-              setErrBlock(null);
-              setSubmitErr("");
             }}
             className={`flex-1 py-2 rounded-md border text-sm font-medium transition ${
               mode === "owner"
@@ -180,8 +169,6 @@ export default function Login() {
             type="button"
             onClick={() => {
               setMode("staff");
-              setErrBlock(null);
-              setSubmitErr("");
             }}
             className={`flex-1 py-2 rounded-md border text-sm font-medium transition ${
               mode === "staff"
@@ -195,17 +182,9 @@ export default function Login() {
 
         <h1 className="text-2xl font-semibold mb-2">{t("login")}</h1>
 
-        {/* Error panel for business errors (verify, signup, reset, etc.) */}
         {errBlock && <LoginErrorPanel {...errBlock} t={t} />}
 
-        {/* Generic submit error (validation/global) */}
-        {submitErr && !errBlock && (
-          <div className="mb-3 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
-            {submitErr}
-          </div>
-        )}
-
-        <label className="block text-sm mt-3">{t("email")}</label>
+        <label className="block text-sm mt-3">{t("common:email")}</label>
         <input
           name="email"
           type="email"
@@ -221,7 +200,7 @@ export default function Login() {
           <div className="mt-1 text-xs text-red-600">{fieldErrors.email}</div>
         )}
 
-        <label className="block text-sm mt-4">{t("password")}</label>
+        <label className="block text-sm mt-4">{t("common:password")}</label>
         <input
           name="password"
           type="password"
@@ -263,23 +242,20 @@ export default function Login() {
           {mode === "owner" ? (
             <>
               {t("create_account")}?{" "}
-              <a href="/signup" className="text-blue-600 underline">
+              <Link to="/signup" className="text-blue-600 underline">
                 {t("signup")}
-              </a>
+              </Link>
             </>
           ) : (
-            <a
-              href="#"
+            <Link
               onClick={(e) => {
                 e.preventDefault();
                 setMode("owner");
-                setErrBlock(null);
-                setSubmitErr("");
               }}
               className="text-blue-600 underline"
             >
               {t("switch_to_owner_login")}
-            </a>
+            </Link>
           )}
         </div>
       </form>
@@ -302,12 +278,12 @@ function LoginErrorPanel({ code, email, mode, t }) {
       return wrap(
         <>
           {t("login_error_unverified")}{" "}
-          <a
+          <Link
             className="underline"
-            href={`/verify-email?email=${encodeURIComponent(email)}`}
+            to={`/verify-email?email=${encodeURIComponent(email)}`}
           >
             {t("verify_now")}
-          </a>
+          </Link>
         </>
       );
     }
@@ -315,12 +291,12 @@ function LoginErrorPanel({ code, email, mode, t }) {
       return wrap(
         <>
           {t("login_error_bad_password")}{" "}
-          <a
+          <Link
             className="underline"
-            href={`/reset-password?email=${encodeURIComponent(email)}`}
+            to={`/reset-password?email=${encodeURIComponent(email)}`}
           >
             {t("reset_password")}
-          </a>
+          </Link>
         </>
       );
     }
@@ -328,12 +304,12 @@ function LoginErrorPanel({ code, email, mode, t }) {
       return wrap(
         <>
           {t("login_error_no_account")}{" "}
-          <a
+          <Link
             className="underline"
-            href={`/signup?email=${encodeURIComponent(email)}`}
+            to={`/signup?email=${encodeURIComponent(email)}`}
           >
             {t("create_account")}
-          </a>
+          </Link>
         </>
       );
     }
@@ -370,12 +346,12 @@ function LoginErrorPanel({ code, email, mode, t }) {
       return wrap(
         <>
           {t("login_staff_bad_password")}{" "}
-          <a
+          <Link
             className="underline"
-            href={`/staff-reset?email=${encodeURIComponent(email)}`}
+            to={`/staff-reset?email=${encodeURIComponent(email)}`}
           >
             {t("reset_password")}
-          </a>
+          </Link>
         </>
       );
     }

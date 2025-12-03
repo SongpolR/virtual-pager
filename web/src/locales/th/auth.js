@@ -25,11 +25,6 @@ const auth = {
   login_staff_contact_owner: "กรุณาติดต่อเจ้าของร้าน",
 
   // Signup
-  logo_requirements_title: "ข้อกำหนดโลโก้",
-  logo_req_size: "ขนาดไฟล์ ≤ 2 mb",
-  logo_req_resolution: "ขนาดภาพ ≤ 1024×1024 px",
-  logo_req_types: "PNG / JPG / JPEG",
-
   password_requirements_title: "ข้อกำหนดรหัสผ่าน",
   password_rule_uppercase: "ตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว",
   password_rule_number: "ตัวเลขอย่างน้อย 1 ตัว",
@@ -39,6 +34,8 @@ const auth = {
   password_rule_match: "รหัสผ่านและยืนยันรหัสผ่านเหมือนกัน",
   password_requirements_incorrect: "รหัสผ่านไม่ถูกต้องตามความต้องการ",
   confirm_password_incorrect: "ยืนยันรหัสผ่านไม่ถูกต้องตามความต้องการ",
+  signup_success:
+    "สร้างบัญชีผู้ใช้สำเร็จแล้ว กรุณายืนยันอีเมลของคุณเพื่อให้การสมัครสมบูรณ์",
 
   // Email verification
   verify_email_title: "ยืนยันอีเมลของคุณ",

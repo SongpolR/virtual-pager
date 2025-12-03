@@ -6,6 +6,7 @@ import {
   mapFieldValidationErrors,
   getGlobalErrorFromAxios,
 } from "../lib/errorHelpers";
+import { Link } from "react-router-dom";
 
 export default function VerifyEmail() {
   const { t } = useTranslation();
@@ -142,9 +143,9 @@ export default function VerifyEmail() {
           <a className="underline" href="mailto:">
             {t("open_email_app")}
           </a>
-          <a className="underline" href="/login">
+          <Link className="underline" to="/login">
             {t("back_to_login")}
-          </a>
+          </Link>
         </div>
       </div>
     </div>

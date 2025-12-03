@@ -24,6 +24,7 @@ import SessionExpiredModal from "./components/SessionExpiredModal";
 import { ToastProvider } from "./components/ToastProvider";
 import { useTranslation } from "react-i18next";
 import Customer from "./pages/Customer.jsx";
+import { Link } from "react-router-dom";
 
 function TopNav({ role }) {
   const { t } = useTranslation("common");
@@ -35,26 +36,27 @@ function TopNav({ role }) {
           {t("app_name")}
         </div>
         <nav className="flex items-center gap-4 text-sm">
-          <a
-            href="/orders"
+          <Link
+            to="/orders"
             className="text-gray-700 hover:text-black underline-offset-4 hover:underline"
           >
             {t("menu.order_menu")}
-          </a>
+          </Link>
+
           {role === "owner" && (
-            <a
-              href="/settings/shop"
+            <Link
+              to="/settings/shop"
               className="text-gray-700 hover:text-black underline-offset-4 hover:underline"
             >
               {t("menu.shop_setting_menu")}
-            </a>
+            </Link>
           )}
-          <a
-            href="/settings/account"
+          <Link
+            to="/settings/account"
             className="text-gray-700 hover:text-black underline-offset-4 hover:underline"
           >
             {t("menu.account_setting_menu")}
-          </a>
+          </Link>
 
           <LanguageSwitcher />
         </nav>
@@ -69,8 +71,7 @@ function Protected({ children, role }) {
   const tokenType = localStorage.getItem("tokenType"); // "owner" | "staff"
 
   if (!token || (role && tokenType !== role)) {
-    location.href = "/login";
-    return null;
+    return <Navigate to="/login" replace />;
   }
 
   return (

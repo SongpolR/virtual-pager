@@ -19,6 +19,16 @@ const common = {
   email_address: "ที่อยู่อีเมล",
   close: "ปิด",
   remove: "ลบ",
+  shop_name: "ชื่อร้าน",
+  shop_logo: "โลโก้ร้าน",
+  logo_requirements_title: "ข้อกำหนดโลโก้",
+  logo_req_size: "ขนาดไฟล์ ≤ 2 mb",
+  logo_req_resolution: "ขนาดภาพ ≤ 1024×1024 px",
+  logo_req_types: "PNG / JPG / JPEG",
+  session_expired_title: "เซสชันหมดอายุ",
+  session_expired_message:
+    "เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบอีกครั้งเพื่อดำเนินการต่อ",
+  ok: "ตกลง",
 
   menu: {
     order_menu: "ออเดอร์",

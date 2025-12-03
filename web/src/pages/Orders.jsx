@@ -12,7 +12,7 @@ const CUSTOMER_BASE_URL =
   import.meta.env.VITE_CUSTOMER_URL || window.location.origin;
 
 export default function Orders() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("orders");
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
 
@@ -170,12 +170,10 @@ export default function Orders() {
     }
 
     const visibleItems = order.items.slice(0, 3);
-    const remainingCount =
-      order.items.length > 3 ? order.items.length - visibleItems.length : 0;
 
     return (
       <div className="mt-2 space-y-1">
-        {visibleItems.map((it, idx) => {
+        {order.items.map((it, idx) => {
           const qty = it.qty ?? 1;
           const name = it.name || t("order_item_unnamed") || "Item";
           const note = it.note?.trim();
@@ -207,12 +205,6 @@ export default function Orders() {
             </div>
           );
         })}
-
-        {remainingCount > 0 && (
-          <div className="pt-0.5 text-[10px] italic text-gray-400">
-            +{remainingCount} more
-          </div>
-        )}
       </div>
     );
   };
@@ -489,7 +481,14 @@ export default function Orders() {
               className="rounded-md"
             />
             <div className="text-xs text-gray-600 break-all text-center px-1">
-              {qrOrderUrl}
+              <a
+                href={qrOrderUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[9px] text-gray-400 underline"
+              >
+                {qrOrderUrl}
+              </a>
             </div>
             <button
               onClick={() => setQrModalOpen(false)}
@@ -538,7 +537,7 @@ function OrderColumn({
                 })}`
               : null;
 
-            const customerUrl = `${CUSTOMER_BASE_URL}/orders/${o.id}`;
+            const customerUrl = `${CUSTOMER_BASE_URL}/orders/${o.public_code}`;
 
             return (
               <div
@@ -569,7 +568,7 @@ function OrderColumn({
                   </div>
 
                   {/* Customer QR + actions */}
-                  <div className="flex flex-col items-center gap-1">
+                  <div className="flex flex-col items-end gap-1">
                     <QRCodeCanvas
                       value={customerUrl}
                       size={52}
@@ -581,7 +580,7 @@ function OrderColumn({
                       href={customerUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[9px] text-gray-400"
+                      className="text-[9px] text-gray-400 underline"
                     >
                       {t("open_customer_page") || "Open page"}
                     </a>

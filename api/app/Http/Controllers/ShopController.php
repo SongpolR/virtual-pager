@@ -9,9 +9,19 @@ use Illuminate\Validation\ValidationException;
 
 class ShopController extends Controller
 {
-  public function show()
+  public function show(Request $req)
   {
-    $shop = DB::table('shops')->first();
+    $ownerId = $req->attributes->get('owner_id');
+
+    if (!$ownerId) {
+      return response()->json([
+        'success' => false,
+        'message' => 'OWNER_NOT_AUTHENTICATED',
+      ], 401);
+    }
+
+    $shop = DB::table('shops')->where('owner_id', $ownerId)->first();
+
     return $shop ?: response()->json(['error' => 'no_shop'], 404);
   }
 

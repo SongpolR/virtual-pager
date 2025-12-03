@@ -12,6 +12,10 @@ return new class extends Migration {
             $table->unsignedBigInteger('shop_id');
             $table->date('order_date');              // for daily scoping
             $table->string('order_no', 50);          // display/order code (can be POS-provided)
+            $table->uuid('public_code')
+                ->unique()
+                ->nullable();
+            $table->enum('status', ['pending', 'ready', 'done'])->default('pending');
             $table->string('status', 20)->default('pending'); // pending | ready | done
 
             $table->json('items')->nullable();       // POS / app-provided items

@@ -163,7 +163,7 @@ export default function StaffSetup() {
       >
         <h1 className="text-xl font-semibold">{t("staff_setup_title")}</h1>
         <div className="mt-3 text-sm text-gray-600">
-          Email: <span className="font-mono">{email}</span>
+          {t("email")}: <span className="font-mono">{email}</span>
         </div>
 
         {/* Invite status panel (invalid/expired/used) */}

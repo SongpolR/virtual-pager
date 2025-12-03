@@ -44,7 +44,7 @@ export default function AccountSettings() {
 
           <button
             type="button"
-            className="inline-flex items-center justify-center bg-black text-white rounded-md px-3 py-2 text-sm hover:bg-gray-900"
+            className="inline-flex items-center justify-center bg-red-500 text-white rounded-md px-3 py-2 text-sm hover:bg-gray-900"
             onClick={logout}
           >
             {t("logout")}

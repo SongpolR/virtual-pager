@@ -44,6 +44,7 @@ Route::post('/staff/reset',  [StaffPasswordResetController::class, 'perform']); 
 // Staff: login (handles 3 cases: no account, invite pending, wrong password)
 Route::post('/staff/login',  [StaffController::class, 'login']);
 
+Route::get('/customer/orders/{publicCode}', [OrderController::class, 'showPublic']);
 
 /*
 |--------------------------------------------------------------------------

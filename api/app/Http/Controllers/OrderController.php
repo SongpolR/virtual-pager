@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -36,11 +39,12 @@ class OrderController extends Controller
             'created_at',
             'ready_at',
             'done_at',
+            'public_code',
         ]);
 
         return response()->json([
-            'sucess' => true,
-            'data' => $orders,
+            'success' => true,
+            'data'    => $orders,
         ], 200);
     }
 
@@ -87,7 +91,6 @@ class OrderController extends Controller
                     ? trim($data['order_no'])
                     : null;
 
-
                 // 1) If order_no provided (e.g. from POS or manual override),
                 //    we just enforce uniqueness for (shop_id + date).
                 if ($providedOrderNo !== null) {
@@ -119,6 +122,7 @@ class OrderController extends Controller
                     'created_by_id'   => $actorId,
                     'created_at'      => $now,
                     'updated_at'      => $now,
+                    'public_code'     => Str::uuid(),
                 ]);
 
                 return $order;
@@ -219,6 +223,9 @@ class OrderController extends Controller
         $order->updated_at = $now;
         $order->save();
 
+        // 🔔 Broadcast to realtime server (Socket.IO bridge)
+        $this->broadcastOrderStatus($order);
+
         return response()->json([
             'id'        => $order->id,
             'order_no'  => $order->order_no,
@@ -252,5 +259,60 @@ class OrderController extends Controller
         }
 
         return str_pad((string) $next, 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Public order view for customer page by public_code.
+     */
+    public function showPublic(string $publicCode)
+    {
+        $order = Order::where('public_code', $publicCode)->first();
+
+        if (!$order) {
+            return response()->json([
+                "success" => false,
+                "message" => "ORDER_NOT_FOUND",
+            ], 404);
+        }
+
+        $shop = DB::table('shops')
+            ->where('id', $order->shop_id)
+            ->first();
+
+        return response()->json([
+            "success" => true,
+            "data" => [
+                "order" => $order,
+                "shop"  => $shop,
+            ],
+        ], 200);
+    }
+
+    /**
+     * Notify realtime server about status change.
+     * Expects a bridge server with POST /broadcast/order-status
+     * that then emits "order_status_updated" via Socket.IO.
+     */
+    protected function broadcastOrderStatus(Order $order): void
+    {
+        // You can also configure this in config/services.php → 'realtime.url'
+        $baseUrl = config('services.realtime.url', env('REALTIME_URL'));
+
+        if (!$baseUrl) {
+            return; // silently skip if not configured
+        }
+
+        try {
+            Http::timeout(2)->post(rtrim($baseUrl, '/') . '/broadcast/order-status', [
+                'order_id' => $order->id,
+                'status'   => $order->status,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Realtime broadcast failed', [
+                'order_id' => $order->id,
+                'status'   => $order->status,
+                'error'    => $e->getMessage(),
+            ]);
+        }
     }
 }

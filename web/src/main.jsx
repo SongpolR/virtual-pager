@@ -22,34 +22,38 @@ import NotFound from "./pages/NotFound.jsx";
 import LanguageSwitcher from "./components/LanguageSwitcher.jsx";
 import SessionExpiredModal from "./components/SessionExpiredModal";
 import { ToastProvider } from "./components/ToastProvider";
+import { useTranslation } from "react-i18next";
+import Customer from "./pages/Customer.jsx";
 
-// Top navigation (shown only for logged-in pages)
 function TopNav({ role }) {
-  // role: "owner" | "staff"
+  const { t } = useTranslation("common");
+
   return (
     <header className="w-full bg-white border-b border-gray-200 mb-4">
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
-        <div className="font-semibold text-sm sm:text-base">Virtual Pager</div>
+        <div className="font-semibold text-sm sm:text-base">
+          {t("app_name")}
+        </div>
         <nav className="flex items-center gap-4 text-sm">
           <a
             href="/orders"
             className="text-gray-700 hover:text-black underline-offset-4 hover:underline"
           >
-            Orders
+            {t("menu.order_menu")}
           </a>
           {role === "owner" && (
             <a
               href="/settings/shop"
               className="text-gray-700 hover:text-black underline-offset-4 hover:underline"
             >
-              Shop Settings
+              {t("menu.shop_setting_menu")}
             </a>
           )}
           <a
             href="/settings/account"
             className="text-gray-700 hover:text-black underline-offset-4 hover:underline"
           >
-            Account
+            {t("menu.account_setting_menu")}
           </a>
 
           <LanguageSwitcher />
@@ -88,6 +92,7 @@ const router = createBrowserRouter([
   { path: "/verify-email", element: <VerifyEmail /> },
   { path: "/staff-setup", element: <StaffSetup /> },
   { path: "/staff-reset", element: <StaffReset /> },
+  { path: "/customer/orders/:publicCode", element: <Customer /> },
 
   // Shared (owner + staff)
   {

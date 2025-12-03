@@ -103,8 +103,6 @@ class AuthController extends Controller
         foreach ($rules as $rule => $params) {
           $ruleUpper = strtoupper($rule);
 
-          logger($ruleUpper);
-
           $code = match ($ruleUpper) {
             'REQUIRED' => config('errorcodes.REQUIRED_FIELD'),
             'EMAIL'    => config('errorcodes.INVALID_EMAIL'),

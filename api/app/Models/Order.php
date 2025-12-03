@@ -17,6 +17,7 @@ class Order extends Model
         'created_by_id',
         'ready_at',
         'done_at',
+        'public_code'
     ];
 
     protected $casts = [

@@ -25,6 +25,8 @@ import { ToastProvider } from "./components/ToastProvider";
 import { useTranslation } from "react-i18next";
 import Customer from "./pages/Customer.jsx";
 import { Link } from "react-router-dom";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 function TopNav({ role }) {
   const { t } = useTranslation("common");
@@ -94,6 +96,8 @@ const router = createBrowserRouter([
   { path: "/staff-setup", element: <StaffSetup /> },
   { path: "/staff-reset", element: <StaffReset /> },
   { path: "/customer/orders/:publicCode", element: <Customer /> },
+  { path: "/forgot-password", element: <ForgotPassword /> },
+  { path: "/reset-password", element: <ResetPassword /> },
 
   // Shared (owner + staff)
   {

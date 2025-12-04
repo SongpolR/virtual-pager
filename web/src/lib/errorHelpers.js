@@ -93,6 +93,12 @@ export function getGlobalErrorFromAxios(err, t, options = {}) {
     return t(key) !== key ? t(key) : "";
   }
 
+  // If backend uses "error_code" e.g. 1000 (Field invalid), 2000 (Invalid email)
+  if (data?.error_code) {
+    const key = `common:errors.${data.error_code}`;
+    if (t(key) !== key) return t(key);
+  }
+
   // If backend uses "message" as a code (e.g. SESSION_EXPIRED, INVALID_CREDENTIAL)
   if (data?.message) {
     const key = `common:errors.${data.message}`;

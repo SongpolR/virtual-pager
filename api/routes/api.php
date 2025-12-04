@@ -25,6 +25,8 @@ Route::get('/health', function () {
 // Owner auth (email/password)
 Route::post('/auth/signup', [AuthController::class, 'signup']); // creates owner + shop, sends verify email (no token)
 Route::post('/auth/login',  [AuthController::class, 'login']);  // requires email_verified_at
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']); // forgot password
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']); // reset password
 
 // Email verification (owner)
 Route::get('/auth/verify-email', [AuthController::class, 'verifyEmail'])->name('auth.verify-email'); // signed URL landing

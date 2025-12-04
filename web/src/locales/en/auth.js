@@ -58,6 +58,18 @@ const auth = {
   staff_reset_password_success: "Your password has been reset successfully.",
   staff_reset_invalid: "This reset link is invalid.",
   staff_reset_expired: "This reset link has expired.",
+
+  reset_request_title: "Forgot your password?",
+  reset_request_intro:
+    "Enter your email address and we will send you a link to reset your password.",
+  reset_request_submit: "Send reset link",
+  reset_request_success:
+    "If this email is registered, we have sent a password reset link.",
+  forgot_password_link: "Forgot your password?",
+  reset_password_title: "Reset your password",
+  reset_password_cta: "Set new password",
+  reset_password_success:
+    "Your password has been reset successfully. Please continue on login page.",
 };
 
 export default auth;

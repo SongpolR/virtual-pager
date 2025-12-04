@@ -111,8 +111,8 @@ return [
     'VERIFY_TOKEN_EXPIRED'   => 3003,
 
     'RESET_EMAIL_SENT'       => 3004, // can be used as a success code in data/message
-    'RESET_INVALID'          => 3005,
-    'RESET_EXPIRED'          => 3006,
+    'RESET_TOKEN_INVALID'    => 3005,
+    'RESET_TOKEN_EXPIRED'    => 3006,
 
     // --------------------------------------------------
     // 4xxx – Staff & Invites

@@ -293,7 +293,7 @@ function LoginErrorPanel({ code, email, mode, t }) {
           {t("login_error_bad_password")}{" "}
           <Link
             className="underline"
-            to={`/reset-password?email=${encodeURIComponent(email)}`}
+            to={`/forgot-password?email=${encodeURIComponent(email)}`}
           >
             {t("reset_password")}
           </Link>

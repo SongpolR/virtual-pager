@@ -63,7 +63,7 @@ class StaffPasswordResetController extends Controller
             if (!$row) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'RESET_INVALID',
+                    'message' => 'RESET_TOKEN_INVALID',
                 ], 400);
             }
 
@@ -71,7 +71,7 @@ class StaffPasswordResetController extends Controller
             if (!$row->created_at || now()->diffInMinutes($row->created_at) > 60) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'RESET_EXPIRED',
+                    'message' => 'RESET_TOKEN_EXPIRED',
                 ], 410);
             }
 

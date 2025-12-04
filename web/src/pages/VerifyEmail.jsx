@@ -79,7 +79,7 @@ export default function VerifyEmail() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
-      <div className="w-[420px] bg-white rounded-xl shadow p-6">
+      <div className="bg-white rounded-xl shadow p-6">
         <h1 className="text-xl font-semibold">{t("verify_email_title")}</h1>
         <p className="text-sm text-gray-600 mt-2">{t("verify_email_desc")}</p>
 

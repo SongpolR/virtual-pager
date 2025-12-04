@@ -55,6 +55,18 @@ const auth = {
   staff_reset_password_success: "รีเซ็ตรหัสผ่านสำเร็จแล้ว",
   staff_reset_invalid: "ลิงก์สำหรับรีเซ็ตรหัสผ่านไม่ถูกต้อง",
   staff_reset_expired: "ลิงก์สำหรับรีเซ็ตรหัสผ่านหมดอายุแล้ว",
+
+  reset_request_title: "ลืมรหัสผ่าน?",
+  reset_request_intro:
+    "กรุณากรอกอีเมลของคุณ เราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปให้",
+  reset_request_submit: "ส่งลิงก์ตั้งรหัสผ่าน",
+  reset_request_success:
+    "หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ให้แล้ว",
+  forgot_password_link: "ลืมรหัสผ่าน?",
+  reset_password_title: "ตั้งรหัสผ่านใหม่",
+  reset_password_cta: "บันทึกรหัสผ่านใหม่",
+  reset_password_success:
+    "รีเซ็ตรหัสผ่านสำเร็จแล้ว กรุณาดำเนินการต่อที่หน้าล็อคอิน",
 };
 
 export default auth;

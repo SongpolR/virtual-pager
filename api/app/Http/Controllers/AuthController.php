@@ -250,33 +250,6 @@ class AuthController extends Controller
     return ['ok' => true];
   }
 
-  public function changePassword(Request $req)
-  {
-    $req->validate([
-      'current_password' => 'required',
-      'new_password' => [
-        'required',
-        'string',
-        'min:8',
-        'regex:/[A-Z]/',
-        'regex:/[0-9]/',
-        'regex:/^[A-Za-z0-9!@#$%^&*._-]+$/',
-      ],
-    ]);
-
-    $token = $req->bearerToken();
-    $row = DB::table('owner_api_tokens')->where('token', $token)->first();
-    if (!$row) return response()->json(['error' => 'unauthorized'], 401);
-
-    $owner = DB::table('owners')->where('id', $row->owner_id)->first();
-    if (!$owner || !Hash::check($req->current_password, $owner->password)) {
-      return response()->json(['error' => 'invalid_current_password'], 422);
-    }
-
-    DB::table('owners')->where('id', $owner->id)->update(['password' => Hash::make($req->new_password)]);
-    return ['ok' => true];
-  }
-
   public function verifyEmail(Request $req)
   {
     if (!$req->hasValidSignature()) {
@@ -285,7 +258,7 @@ class AuthController extends Controller
     $email = $req->query('email');
     $owner = DB::table('owners')->where('email', $email)->first();
     if (!$owner) {
-      return response()->json(['message' => 'Unknown account', 'errors' => [config('errorcodes.UNKNOWN')]], 404);
+      return response()->json(['message' => 'ACCOUNT_NOT_FOUND', 'error_code' => config('errorcodes.ACCOUNT_NOT_FOUND')], 404);
     }
     DB::table('owners')->where('id', $owner->id)->update(['email_verified_at' => now()]);
     return view('verified'); // tiny success page, or JSON if you prefer
@@ -369,12 +342,14 @@ class AuthController extends Controller
     }
   }
 
-  public function forgot(Request $req)
+  public function forgotPassword(Request $req)
   {
-    $req->validate(['email' => 'required|email']);
-    $owner = DB::table('owners')->where('email', $req->email)->first();
-    // Always respond OK (avoid user enumeration)
-    if ($owner) {
+    try {
+      $req->validate(['email' => 'required|email']);
+      $owner = DB::table('owners')->where('email', $req->email)->first();
+      if (!$owner) {
+        return response()->json(['message' => 'ACCOUNT_NOT_FOUND', 'error_code' => config('errorcodes.ACCOUNT_NOT_FOUND')], 404);
+      }
       $plain = Str::random(64);
       $hashed = Hash::make($plain);
       DB::table('password_reset_tokens')->updateOrInsert(
@@ -385,33 +360,118 @@ class AuthController extends Controller
       $frontend = config('app.frontend_origin', 'http://localhost:5173');
       $resetUrl = $frontend . '/reset-password?token=' . urlencode($plain) . '&email=' . urlencode($owner->email);
       Mail::to($owner->email)->send(new PasswordResetMail($resetUrl));
+      return response()->json([
+        'success' => true,
+        'message' => 'FORGOT_PASSWORD_EMAIL_SENT',
+      ], 200);
+    } catch (ValidationException $e) {
+      // Map Laravel validation rules → numeric codes in config/errorcodes.php
+      $map = [
+        'REQUIRED' => config('errorcodes.REQUIRED_FIELD'),
+        'EMAIL'    => config('errorcodes.INVALID_EMAIL'),
+        'STRING'   => config('errorcodes.INVALID_FORMAT'),
+        'MIN'      => config('errorcodes.TOO_SHORT') ?? config('errorcodes.VALIDATION_ERROR'),
+        'MAX'      => config('errorcodes.TOO_LONG')  ?? config('errorcodes.VALIDATION_ERROR'),
+      ];
+
+      $errors = [];
+      $failed = $e->validator->failed(); // field => [rule => params]
+
+      foreach ($failed as $field => $rules) {
+        foreach ($rules as $rule => $params) {
+          $key  = strtoupper($rule);
+          $code = $map[$key] ?? config('errorcodes.VALIDATION_ERROR');
+
+          $meta = [];
+          if ($key === 'MIN' && isset($params[0])) {
+            $meta['min'] = $params[0];
+          }
+          if ($key === 'MAX' && isset($params[0])) {
+            $meta['max'] = $params[0];
+          }
+
+          $errors[$field][] = [
+            'code' => $code,
+            'meta' => $meta,
+          ];
+        }
+      }
+
+      return response()->json([
+        'success' => false,
+        'message' => 'VALIDATION_FAILED',
+        'errors'  => $errors,
+      ], 422);
     }
-    return response()->json(['message' => 'OK'], 200);
   }
 
-  public function reset(Request $req)
+  public function resetPassword(Request $req)
   {
-    $req->validate([
-      'email' => 'required|email',
-      'token' => 'required',
-      'new_password' => ['required', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/^[A-Za-z0-9!@#$%^&*._-]+$/'],
-    ]);
+    try {
+      $req->validate([
+        'email' => 'required|email',
+        'token' => 'required',
+        'password' => ['required', 'string', 'min:8', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/^[A-Za-z0-9!@#$%^&*._-]+$/'],
+        'confirm_password' => 'required|string|same:password',
+      ]);
 
-    $row = DB::table('password_reset_tokens')->where('email', $req->email)->first();
-    if (!$row) {
-      return response()->json(['message' => 'Invalid token', 'errors' => [config('errorcodes.RESET_TOKEN_INVALID')]], 422);
+      $row = DB::table('password_reset_tokens')->where('email', $req->email)->first();
+      if (!$row) {
+        return response()->json(['message' => 'RESET_TOKEN_INVALID', 'error_code' => config('errorcodes.RESET_TOKEN_INVALID')], 403);
+      }
+      // check age (60 minutes)
+      if (!$row->created_at || now()->diffInMinutes($row->created_at) > 60) {
+        return response()->json(['message' => 'RESET_TOKEN_EXPIRED', 'error_code' => config('errorcodes.RESET_TOKEN_EXPIRED')], 403);
+      }
+      // verify token
+      if (!Hash::check($req->token, $row->token)) {
+        return response()->json(['message' => 'RESET_TOKEN_INVALID', 'error_code' => config('errorcodes.RESET_TOKEN_INVALID')], 403);
+      }
+      // update password and cleanup
+      DB::table('owners')->where('email', $req->email)->update(['password' => Hash::make($req->new_password)]);
+      DB::table('password_reset_tokens')->where('email', $req->email)->delete();
+      return response()->json([
+        'success' => true,
+        'message' => 'RESET_PASSWORD_SUCCESS',
+      ], 200);
+    } catch (ValidationException $e) {
+      // Map Laravel validation rules → numeric codes in config/errorcodes.php
+      $map = [
+        'REQUIRED' => config('errorcodes.REQUIRED_FIELD'),
+        'EMAIL'    => config('errorcodes.INVALID_EMAIL'),
+        'STRING'   => config('errorcodes.INVALID_FORMAT'),
+        'MIN'      => config('errorcodes.TOO_SHORT') ?? config('errorcodes.VALIDATION_ERROR'),
+        'MAX'      => config('errorcodes.TOO_LONG')  ?? config('errorcodes.VALIDATION_ERROR'),
+      ];
+
+      $errors = [];
+      $failed = $e->validator->failed(); // field => [rule => params]
+
+      foreach ($failed as $field => $rules) {
+        foreach ($rules as $rule => $params) {
+          $key  = strtoupper($rule);
+          $code = $map[$key] ?? config('errorcodes.VALIDATION_ERROR');
+
+          $meta = [];
+          if ($key === 'MIN' && isset($params[0])) {
+            $meta['min'] = $params[0];
+          }
+          if ($key === 'MAX' && isset($params[0])) {
+            $meta['max'] = $params[0];
+          }
+
+          $errors[$field][] = [
+            'code' => $code,
+            'meta' => $meta,
+          ];
+        }
+      }
+
+      return response()->json([
+        'success' => false,
+        'message' => 'VALIDATION_FAILED',
+        'errors'  => $errors,
+      ], 422);
     }
-    // check age (60 minutes)
-    if (!$row->created_at || now()->diffInMinutes($row->created_at) > 60) {
-      return response()->json(['message' => 'Token expired', 'errors' => [config('errorcodes.RESET_TOKEN_EXPIRED')]], 422);
-    }
-    // verify token
-    if (!Hash::check($req->token, $row->token)) {
-      return response()->json(['message' => 'Invalid token', 'errors' => [config('errorcodes.RESET_TOKEN_INVALID')]], 422);
-    }
-    // update password and cleanup
-    DB::table('owners')->where('email', $req->email)->update(['password' => Hash::make($req->new_password)]);
-    DB::table('password_reset_tokens')->where('email', $req->email)->delete();
-    return response()->json(['message' => 'OK'], 200);
   }
 }

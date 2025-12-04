@@ -7,18 +7,16 @@ import {
   getGlobalErrorFromAxios,
 } from "../lib/errorHelpers";
 import { Link } from "react-router-dom";
+import { useToast } from "../components/ToastProvider";
 
 export default function VerifyEmail() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("auth");
   const params = new URLSearchParams(location.search);
   const initialEmail = params.get("email") || "";
-
   const [email, setEmail] = useState(initialEmail);
-  const [status, setStatus] = useState(null); // "sent" | null
   const [fieldErrors, setFieldErrors] = useState({});
-  const [submitErr, setSubmitErr] = useState("");
-
   const canSubmit = useMemo(() => /\S+@\S+\.\S+/.test(email), [email]);
+  const { showToast } = useToast();
 
   const updateEmail = (value) => {
     setEmail(value);
@@ -30,15 +28,9 @@ export default function VerifyEmail() {
       delete next.email;
       return next;
     });
-
-    // Clear global + status
-    if (submitErr) setSubmitErr("");
-    if (status) setStatus(null);
   };
 
   const resend = async () => {
-    setStatus(null);
-    setSubmitErr("");
     setFieldErrors({});
 
     try {
@@ -49,22 +41,12 @@ export default function VerifyEmail() {
       const data = res.data;
 
       if (data?.success) {
-        // Optionally you can use data.message as code, e.g. VERIFY_EMAIL_SENT
-        setStatus("sent");
+        showToast({ type: "success", message: t("link_sent") });
         return;
-      }
-
-      // 2xx but success=false
-      if (data?.message) {
-        const key = `errors.${data.message}`;
-        const translated = t(key) !== key ? t(key) : data.message;
-        setSubmitErr(translated);
-      } else {
-        setSubmitErr(t("errors.9000") || "Unexpected error");
       }
     } catch (err) {
       if (!err.response) {
-        setSubmitErr(getGlobalErrorFromAxios(err, t));
+        showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
         return;
       }
 
@@ -82,18 +64,16 @@ export default function VerifyEmail() {
         const globalMsg = getGlobalErrorFromAxios(err, t, {
           defaultValidationCode: 1000,
         });
-        setSubmitErr(globalMsg);
         return;
       }
 
       // Non-validation error with message as code
       if (data?.message) {
-        const msg = getGlobalErrorFromAxios(err, t);
-        setSubmitErr(msg);
+        showToast({ type: "error", message: data?.message });
         return;
       }
 
-      setSubmitErr(getGlobalErrorFromAxios(err, t));
+      showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
     }
   };
 
@@ -103,21 +83,9 @@ export default function VerifyEmail() {
         <h1 className="text-xl font-semibold">{t("verify_email_title")}</h1>
         <p className="text-sm text-gray-600 mt-2">{t("verify_email_desc")}</p>
 
-        {/* Global error */}
-        {submitErr && (
-          <div className="mt-3 rounded border border-red-300 bg-red-50 p-2 text-sm text-red-700">
-            {submitErr}
-          </div>
-        )}
-
-        {/* Success state */}
-        {status === "sent" && (
-          <div className="mt-3 rounded border border-green-300 bg-green-50 p-2 text-sm text-green-700">
-            {t("link_sent")}
-          </div>
-        )}
-
-        <label className="block mt-4 text-sm">{t("email_address")}</label>
+        <label className="block mt-4 text-sm">
+          {t("common:email_address")}
+        </label>
         <input
           type="email"
           className={`border p-2 rounded w-full ${
@@ -144,7 +112,7 @@ export default function VerifyEmail() {
             {t("open_email_app")}
           </a>
           <Link className="underline" to="/login">
-            {t("back_to_login")}
+            {t("common:back_to_login")}
           </Link>
         </div>
       </div>

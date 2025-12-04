@@ -12,7 +12,7 @@ export function ToastProvider({ children }) {
     ({
       type = "info", // 'info' | 'success' | 'warning' | 'error'
       message = "",
-      duration = 4000,
+      duration = 5000,
       dismissible = true,
     }) => {
       if (!message) return;

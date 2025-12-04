@@ -21,13 +21,17 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
+    const path = error?.response?.config?.url || "";
 
-    if (status === 401) {
-      // เคลียร์ session เผื่อไว้เลย
+    // Ignore 401 only for login API
+    const isLoginEndpoint = path.includes("/auth/login");
+
+    if (status === 401 && !isLoginEndpoint) {
+      // Clear session anyway
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
-      // แจ้งไปยัง React ผ่าน custom event
+      // Notify React
       window.dispatchEvent(new Event("session-expired"));
     }
 

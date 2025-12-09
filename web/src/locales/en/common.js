@@ -1,6 +1,7 @@
 const common = {
   // General
-  app_name: "ViPa",
+  app_name: "VIPA",
+  full_app_name: "Virtual Pager",
   loading: "Loading...",
   logout: "Logout",
   email: "Email",
@@ -35,11 +36,16 @@ const common = {
   cancel: "Cancel",
   logout: "Logout",
   preview: "Preview",
+  light: "Light",
+  dark: "Dark",
+  english: "English",
+  thai: "Thai",
 
   menu: {
     order_menu: "Order",
     shop_setting_menu: "Shop Setting",
     account_setting_menu: "Account Setting",
+    preferences_label: "Preferences",
   },
 
   // Generic error codes (can be used anywhere)

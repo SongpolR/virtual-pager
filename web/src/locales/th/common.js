@@ -1,5 +1,6 @@
 const common = {
   app_name: "วิภา",
+  full_app_name: "เพจเจอร์จำลอง",
   loading: "กำลังโหลด...",
   logout: "ออกจากระบบ",
   email: "อีเมล",
@@ -34,11 +35,16 @@ const common = {
   cancel: "ยกเลิก",
   logout: "ออกจากระบบ",
   preview: "ตัวอย่าง",
+  light: "สว่าง",
+  dark: "มืด",
+  english: "อังกฤษ",
+  thai: "ไทย",
 
   menu: {
     order_menu: "ออเดอร์",
     shop_setting_menu: "ตั้งค่าร้าน",
     account_setting_menu: "ตั้งค่าบัญชี",
+    preferences_label: "การตั้งค่า",
   },
 
   errors: {

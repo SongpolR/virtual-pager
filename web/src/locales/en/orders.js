@@ -36,6 +36,8 @@ const orders = {
 
   view_qr: "View QR",
   open_customer_page: "Open customer page",
+  orders_subtitle:
+    "Manage incoming orders and update their status in real time.",
 };
 
 export default orders;

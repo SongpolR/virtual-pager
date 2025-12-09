@@ -3,6 +3,7 @@ import React from "react";
 import AppShell from "./AppShell.jsx";
 import ThemeSwitcher from "../ThemeSwitcher.jsx";
 import LanguageSwitcher from "../LanguageSwitcher.jsx";
+import { useTranslation } from "react-i18next";
 
 /**
  * AuthLayout:
@@ -17,13 +18,14 @@ export default function AuthLayout({
   headerRight = null, // e.g. mode toggle buttons
   children,
 }) {
+  const { t } = useTranslation("");
   return (
     <AppShell
       withGlow
       toolbar={
         <>
-          <ThemeSwitcher />
           <LanguageSwitcher />
+          <ThemeSwitcher />
         </>
       }
     >
@@ -33,7 +35,7 @@ export default function AuthLayout({
           <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-slate-100 text-slate-700 ring-1 ring-slate-200 dark:bg-slate-900 dark:text-slate-200 dark:ring-slate-700/70">
             <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400" />
           </div>
-          <span>ViPa · Virtual Pager</span>
+          <span>{t("app_name")}</span> · <span>{t("full_app_name")}</span>
         </div>
 
         {/* Card */}

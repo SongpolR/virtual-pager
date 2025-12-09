@@ -6,7 +6,7 @@ import api from "../lib/api";
 import { useToast } from "../components/ToastProvider";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { getGlobalErrorFromAxios } from "../lib/errorHelpers";
-import { Link } from "react-router-dom";
+import RefreshIcon from "../components/icons/RefreshIcon.jsx";
 
 // Base URL for customer-facing order page
 const CUSTOMER_BASE_URL =
@@ -16,9 +16,7 @@ export default function Orders() {
   const { t } = useTranslation("orders");
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
-
   const [orders, setOrders] = useState([]);
-
   const [creating, setCreating] = useState(false);
 
   // create form
@@ -111,7 +109,6 @@ export default function Orders() {
       await api.post("/orders", body);
 
       showToast({ type: "success", message: t("order_created") });
-      console.log(1123);
       setOrderNo("");
       setPosRef("");
       setItems([{ name: "", qty: 1, note: "" }]);
@@ -143,16 +140,22 @@ export default function Orders() {
     try {
       await api.post(endpoint);
       await loadOrders();
-    } catch (e) {
+    } catch (err) {
       const data = err?.response?.data;
       const code =
         data && Array.isArray(data.errors) && data.errors.length
           ? data.errors[0]
           : null;
       if (code === 1500) {
-        showToast({ type: "error", message: t("order_invalid_transition") });
-      } else if (code === 1500) {
-        showToast({ type: "error", message: t("order_not_found") });
+        showToast({
+          type: "error",
+          message: t("order_invalid_transition"),
+        });
+      } else if (code === 1501) {
+        showToast({
+          type: "error",
+          message: t("order_not_found"),
+        });
       } else {
         showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });
       }
@@ -170,8 +173,6 @@ export default function Orders() {
       return null;
     }
 
-    const visibleItems = order.items.slice(0, 3);
-
     return (
       <div className="mt-2 space-y-1">
         {order.items.map((it, idx) => {
@@ -182,22 +183,22 @@ export default function Orders() {
           return (
             <div
               key={idx}
-              className="flex items-center gap-2 rounded-md bg-white px-2 py-1"
+              className="flex items-center gap-2 rounded-md bg-slate-50 px-2 py-1 dark:bg-slate-900/70"
             >
               {/* Qty pill */}
-              <span className="mt-0.5 inline-flex h-5 min-w-[2rem] items-center justify-center rounded-full bg-gray-100 text-[10px] font-semibold text-gray-800">
+              <span className="mt-0.5 inline-flex h-5 min-w-[2rem] items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100">
                 {qty}×
               </span>
 
               {/* Name + note chip */}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1">
-                  <span className="truncate text-[11px] font-semibold text-gray-900">
+                  <span className="truncate text-[11px] font-semibold text-slate-900 dark:text-slate-50">
                     {name}
                   </span>
                 </div>
                 {note && (
-                  <div className="mt-0.5 inline-flex max-w-full items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] text-amber-700">
+                  <div className="mt-0.5 inline-flex max-w-full items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">
                     <span className="text-[9px]">●</span>
                     <span className="truncate">{note}</span>
                   </div>
@@ -230,45 +231,50 @@ export default function Orders() {
   }
 
   return (
-    <div className="mt-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-        <h1 className="text-2xl font-bold">{t("orders_title") || "Orders"}</h1>
-        <button
-          type="button"
-          onClick={loadOrders}
-          className="self-start sm:self-auto text-xs border border-gray-300 rounded px-3 py-1 hover:bg-gray-100"
-        >
-          {t("refresh") || "Refresh"}
-        </button>
+    <div className="mt-4 space-y-4 text-slate-900 dark:text-slate-100 overflow-x-hidden">
+      {/* Header row */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-xl font-semibold sm:text-2xl">
+            {t("orders_title") || "Orders"}
+          </h1>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            {t("orders_subtitle") ||
+              "Manage incoming orders and update their status in real time."}
+          </p>
+        </div>
       </div>
 
       {/* Create order */}
-      <div className="bg-white rounded-xl shadow p-4 mb-6">
-        <h2 className="text-lg font-semibold mb-2">
+      <div className="app-card-surface mb-4 rounded-2xl border shadow-sm shadow-slate-900/5 dark:shadow-slate-900/40">
+        <div className="border-b border-slate-100 px-4 pb-3 pt-3.5 text-sm font-semibold text-slate-800 dark:border-slate-800 dark:text-slate-100">
           {t("order_create_title") || "Create order"}
-        </h2>
-        <form onSubmit={handleCreate} className="flex flex-col gap-4">
+        </div>
+        <form
+          onSubmit={handleCreate}
+          className="flex flex-col gap-4 px-4 pb-4 pt-3"
+        >
           {/* Basic info */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-end">
             <div className="w-full sm:flex-1">
-              <label className="block text-xs text-gray-600 mb-1">
+              <label className="mb-1 block text-[11px] font-medium text-slate-600 dark:text-slate-300">
                 {t("order_no_label") || "Order No. (optional)"}
               </label>
               <input
                 type="text"
-                className="w-full border rounded px-2 py-1 text-sm"
+                className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:ring-offset-slate-100 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-offset-slate-900"
                 value={orderNo}
                 onChange={(e) => setOrderNo(e.target.value)}
                 placeholder={t("order_no_placeholder") || "e.g. A-101"}
               />
             </div>
             <div className="w-full sm:flex-1">
-              <label className="block text-xs text-gray-600 mb-1">
+              <label className="mb-1 block text-[11px] font-medium text-slate-600 dark:text-slate-300">
                 {t("pos_ref_label") || "POS Ref (optional)"}
               </label>
               <input
                 type="text"
-                className="w-full border rounded px-2 py-1 text-sm"
+                className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:ring-offset-slate-100 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-offset-slate-900"
                 value={posRef}
                 onChange={(e) => setPosRef(e.target.value)}
                 placeholder={t("pos_ref_placeholder") || "e.g. POS-2025-0001"}
@@ -277,7 +283,7 @@ export default function Orders() {
             <button
               type="submit"
               disabled={creating}
-              className="whitespace-nowrap bg-black text-white text-sm px-4 py-2 rounded hover:bg-gray-900 disabled:opacity-60 w-full sm:w-auto"
+              className="w-full whitespace-nowrap rounded-full bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-md shadow-indigo-500/40 transition hover:-translate-y-[1px] hover:bg-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 active:translate-y-0 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             >
               {creating
                 ? t("order_creating") || "Creating..."
@@ -286,15 +292,15 @@ export default function Orders() {
           </div>
 
           {/* Items section */}
-          <div className="w-full border border-gray-200 rounded-lg p-3 bg-gray-50">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-semibold text-gray-700">
+          <div className="w-full rounded-xl border border-dashed border-slate-200 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-900/60">
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-xs font-semibold text-slate-700 dark:text-slate-200">
                 {t("order_items_title") || "Order items"}
               </h3>
               <button
                 type="button"
                 onClick={addItemRow}
-                className="text-[11px] px-2 py-1 border border-dashed border-gray-400 rounded hover:bg-white"
+                className="rounded-full border border-slate-300 bg-white px-2 py-1 text-[11px] font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
               >
                 + {t("add_item") || "Add item"}
               </button>
@@ -304,11 +310,11 @@ export default function Orders() {
               {items.map((it, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-col gap-1 sm:grid sm:grid-cols-[minmax(0,3fr)_minmax(0,1fr)_minmax(0,3fr)_auto] sm:items-center sm:gap-2"
+                  className="flex flex-col gap-1 rounded-xl bg-white/90 p-2 text-xs shadow-sm ring-1 ring-slate-100 dark:bg-slate-900/80 dark:ring-slate-700 sm:grid sm:grid-cols-[minmax(0,3fr)_minmax(0,1fr)_minmax(0,3fr)_auto] sm:items-center sm:gap-2"
                 >
                   <input
                     type="text"
-                    className="border rounded px-2 py-1 text-xs sm:text-sm w-full"
+                    className="w-full rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500"
                     value={it.name}
                     onChange={(e) =>
                       handleItemChange(idx, "name", e.target.value)
@@ -318,13 +324,13 @@ export default function Orders() {
                     }
                   />
                   <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="text-[11px] text-gray-500 sm:hidden">
+                    <span className="text-[11px] text-slate-500 sm:hidden">
                       {t("qty_label") || "Qty"}
                     </span>
                     <input
                       type="number"
                       min={1}
-                      className="border rounded px-2 py-1 text-xs sm:text-sm w-20"
+                      className="w-20 rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-900 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                       value={it.qty}
                       onChange={(e) =>
                         handleItemChange(idx, "qty", e.target.value)
@@ -333,7 +339,7 @@ export default function Orders() {
                   </div>
                   <input
                     type="text"
-                    className="border rounded px-2 py-1 text-xs sm:text-sm w-full"
+                    className="w-full rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500"
                     value={it.note}
                     onChange={(e) =>
                       handleItemChange(idx, "note", e.target.value)
@@ -346,9 +352,9 @@ export default function Orders() {
                     type="button"
                     onClick={() => removeItemRow(idx)}
                     disabled={items.length === 1}
-                    className="mt-1 sm:mt-0 text-[11px] px-2 py-1 border border-red-300 text-red-500 rounded hover:bg-red-50 disabled:opacity-40 self-start sm:self-auto"
+                    className="mt-1 inline-flex items-center justify-center rounded-full border border-red-300 px-2 py-1 text-[11px] font-medium text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-red-500/60 dark:text-red-200 dark:hover:bg-red-950/40 sm:mt-0"
                   >
-                    {t("remove") || "Remove"}
+                    {t("common:remove") || "Remove"}
                   </button>
                 </div>
               ))}
@@ -358,145 +364,170 @@ export default function Orders() {
       </div>
 
       {/* Orders columns / board */}
-      {loading ? (
-        <div className="text-gray-600 text-sm">{t("loading")}</div>
-      ) : (
-        <>
-          {/* Mobile: tabbed layout (one column at a time) */}
-          <div className="md:hidden mb-3">
-            <div className="flex text-xs border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setMobileStatus("pending")}
-                className={`flex-1 px-3 py-2 ${
-                  mobileStatus === "pending"
-                    ? "bg-black text-white"
-                    : "bg-white text-gray-700"
-                }`}
-              >
-                {t("order_status_pending") || "Pending"}{" "}
-                <span className="ml-1 text-[10px] text-gray-300">
-                  ({pendingOrders.length})
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setMobileStatus("ready")}
-                className={`flex-1 px-3 py-2 border-l border-gray-200 ${
-                  mobileStatus === "ready"
-                    ? "bg-black text-white"
-                    : "bg-white text-gray-700"
-                }`}
-              >
-                {t("order_status_ready") || "Ready"}{" "}
-                <span className="ml-1 text-[10px] text-gray-300">
-                  ({readyOrders.length})
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setMobileStatus("done")}
-                className={`flex-1 px-3 py-2 border-l border-gray-200 ${
-                  mobileStatus === "done"
-                    ? "bg-black text-white"
-                    : "bg-white text-gray-700"
-                }`}
-              >
-                {t("order_status_done") || "Done"}{" "}
-                <span className="ml-1 text-[10px] text-gray-300">
-                  ({doneOrders.length})
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div className="md:hidden">
-            <OrderColumn
-              title={mobileTitle}
-              orders={mobileOrders}
-              t={t}
-              onReady={
+      <>
+        {/* Mobile: tabbed layout (one column at a time) */}
+        <div className="mb-3 md:hidden">
+          <div className="flex overflow-hidden rounded-full border border-slate-200 bg-slate-100 text-xs dark:border-slate-700 dark:bg-slate-900/80">
+            <button
+              type="button"
+              onClick={() => setMobileStatus("pending")}
+              className={[
+                "flex-1 px-3 py-2 font-medium transition",
                 mobileStatus === "pending"
-                  ? (o) => changeStatus(o, "ready")
-                  : null
-              }
-              onDone={
-                mobileStatus === "ready" ? (o) => changeStatus(o, "done") : null
-              }
-              renderItemsSummary={renderItemsSummary}
-              onShowQr={handleShowQr}
-            />
+                  ? "bg-indigo-500 text-white shadow-inner"
+                  : "text-slate-700 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800",
+              ].join(" ")}
+            >
+              {t("order_status_pending") || "Pending"}{" "}
+              <span className="ml-1 text-[10px] text-slate-200 dark:text-slate-400">
+                ({pendingOrders.length})
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileStatus("ready")}
+              className={[
+                "flex-1 border-l border-slate-200 px-3 py-2 font-medium transition dark:border-slate-700",
+                mobileStatus === "ready"
+                  ? "bg-indigo-500 text-white shadow-inner"
+                  : "text-slate-700 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800",
+              ].join(" ")}
+            >
+              {t("order_status_ready") || "Ready"}{" "}
+              <span className="ml-1 text-[10px] text-slate-200 dark:text-slate-400">
+                ({readyOrders.length})
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileStatus("done")}
+              className={[
+                "flex-1 border-l border-slate-200 px-3 py-2 font-medium transition dark:border-slate-700",
+                mobileStatus === "done"
+                  ? "bg-indigo-500 text-white shadow-inner"
+                  : "text-slate-700 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800",
+              ].join(" ")}
+            >
+              {t("order_status_done") || "Done"}{" "}
+              <span className="ml-1 text-[10px] text-slate-200 dark:text-slate-400">
+                ({doneOrders.length})
+              </span>
+            </button>
           </div>
+        </div>
 
-          {/* Desktop / tablet: 3-column board */}
-          <div className="hidden md:grid gap-4 md:grid-cols-3">
-            {/* Pending */}
-            <OrderColumn
-              title={t("order_status_pending") || "Pending"}
-              orders={pendingOrders}
-              t={t}
-              onReady={(o) => changeStatus(o, "ready")}
-              onDone={null}
-              renderItemsSummary={renderItemsSummary}
-              onShowQr={handleShowQr}
-            />
+        <div className="md:hidden">
+          <OrderColumn
+            title={mobileTitle}
+            orders={mobileOrders}
+            t={t}
+            onReady={
+              mobileStatus === "pending"
+                ? (o) => changeStatus(o, "ready")
+                : null
+            }
+            onDone={
+              mobileStatus === "ready" ? (o) => changeStatus(o, "done") : null
+            }
+            renderItemsSummary={renderItemsSummary}
+            onShowQr={handleShowQr}
+          />
+        </div>
 
-            {/* Ready */}
-            <OrderColumn
-              title={t("order_status_ready") || "Ready"}
-              orders={readyOrders}
-              t={t}
-              onReady={null}
-              onDone={(o) => changeStatus(o, "done")}
-              renderItemsSummary={renderItemsSummary}
-              onShowQr={handleShowQr}
-            />
+        {/* Desktop / tablet: 3-column board */}
+        <div className="hidden gap-4 md:grid md:grid-cols-3">
+          {/* Pending */}
+          <OrderColumn
+            title={t("order_status_pending") || "Pending"}
+            orders={pendingOrders}
+            t={t}
+            onReady={(o) => changeStatus(o, "ready")}
+            onDone={null}
+            renderItemsSummary={renderItemsSummary}
+            onShowQr={handleShowQr}
+          />
 
-            {/* Done */}
-            <OrderColumn
-              title={t("order_status_done") || "Done"}
-              orders={doneOrders}
-              t={t}
-              onReady={null}
-              onDone={null}
-              renderItemsSummary={renderItemsSummary}
-              onShowQr={handleShowQr}
-            />
-          </div>
-        </>
-      )}
+          {/* Ready */}
+          <OrderColumn
+            title={t("order_status_ready") || "Ready"}
+            orders={readyOrders}
+            t={t}
+            onReady={null}
+            onDone={(o) => changeStatus(o, "done")}
+            renderItemsSummary={renderItemsSummary}
+            onShowQr={handleShowQr}
+          />
 
-      {/* Large QR Modal (always outside responsive wrappers) */}
+          {/* Done */}
+          <OrderColumn
+            title={t("order_status_done") || "Done"}
+            orders={doneOrders}
+            t={t}
+            onReady={null}
+            onDone={null}
+            renderItemsSummary={renderItemsSummary}
+            onShowQr={handleShowQr}
+          />
+        </div>
+      </>
+
+      {/* Floating refresh button */}
+      <button
+        type="button"
+        onClick={loadOrders}
+        className="
+    fixed bottom-4 right-4 z-40 flex items-center justify-center
+    rounded-full shadow-lg shadow-indigo-500/40 transition
+    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300
+    active:translate-y-0 active:scale-[0.97]
+
+    /* --- Mobile (icon-only circular button) --- */
+    h-12 w-12 bg-indigo-500 hover:bg-indigo-400 sm:h-auto sm:w-auto
+
+    /* --- Desktop (icon + text pill button) --- */
+    sm:flex sm:flex-row sm:gap-2 sm:rounded-full sm:px-4 sm:py-2 sm:text-sm sm:font-medium
+    text-white
+  "
+      >
+        <RefreshIcon size={18} className="text-white" />
+
+        {/* Text label only on sm+ */}
+        <span className="hidden sm:inline">{t("refresh") || "Refresh"}</span>
+      </button>
+
+      {/* Large QR Modal */}
       {qrModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
           onClick={() => setQrModalOpen(false)}
         >
           <div
-            className="bg-white rounded-xl shadow-xl p-4 w-full max-w-xs flex flex-col items-center gap-3"
+            className="w-full max-w-xs rounded-2xl bg-white p-4 text-slate-900 shadow-2xl shadow-slate-900/40 dark:bg-slate-900 dark:text-slate-50"
             onClick={(e) => e.stopPropagation()}
           >
-            <QRCodeCanvas
-              value={qrOrderUrl}
-              size={260}
-              className="rounded-md"
-            />
-            <div className="text-xs text-gray-600 break-all text-center px-1">
-              <Link
-                to={qrOrderUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[9px] text-gray-400 underline"
+            <div className="flex flex-col items-center gap-3">
+              <QRCodeCanvas
+                value={qrOrderUrl}
+                size={260}
+                className="rounded-md bg-white dark:bg-slate-50"
+              />
+              <div className="px-1 text-center text-[10px] text-slate-500 break-all dark:text-slate-400">
+                <a
+                  href={qrOrderUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2"
+                >
+                  {qrOrderUrl}
+                </a>
+              </div>
+              <button
+                onClick={() => setQrModalOpen(false)}
+                className="mt-1 w-full rounded-full bg-slate-900 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-200"
               >
-                {qrOrderUrl}
-              </Link>
+                {t("close") || "Close"}
+              </button>
             </div>
-            <button
-              onClick={() => setQrModalOpen(false)}
-              className="mt-2 bg-black text-white text-xs px-4 py-2 rounded hover:bg-gray-900 w-full"
-            >
-              {t("close") || "Close"}
-            </button>
           </div>
         </div>
       )}
@@ -514,18 +545,22 @@ function OrderColumn({
   onShowQr,
 }) {
   return (
-    <div className="bg-white rounded-xl shadow p-3 min-h-[160px] flex flex-col">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-semibold">{title}</h3>
-        <span className="text-xs text-gray-400">{orders.length}</span>
+    <div className="app-card-surface flex min-h-[160px] w-full flex-col rounded-2xl border shadow-sm shadow-slate-900/5 dark:shadow-slate-900/40">
+      <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2.5 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+        <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+          {title}
+        </h3>
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600 dark:bg-slate-900 dark:text-slate-300">
+          {orders.length}
+        </span>
       </div>
 
       {orders.length === 0 ? (
-        <div className="flex-1 text-xs text-gray-400 flex items-center justify-center py-4">
+        <div className="flex flex-1 items-center justify-center py-4 text-xs text-slate-400 dark:text-slate-500">
           {t("orders_empty") || "No orders"}
         </div>
       ) : (
-        <div className="space-y-3 overflow-y-auto max-h-[320px] sm:max-h-[360px] p-2">
+        <div className="max-h-[320px] space-y-3 overflow-y-auto p-2 sm:max-h-[360px]">
           {orders.map((o) => {
             const createdAt = o.created_at ? new Date(o.created_at) : null;
             const createdAtLabel = createdAt
@@ -543,16 +578,16 @@ function OrderColumn({
             return (
               <div
                 key={o.id}
-                className="rounded-lg p-2 text-xs text-gray-800 bg-gray-50 shadow hover:shadow-md cursor-pointer"
+                className="cursor-pointer rounded-xl bg-slate-50 p-2 text-xs text-slate-800 shadow-sm ring-1 ring-slate-100 transition hover:-translate-y-[1px] hover:shadow-md hover:ring-indigo-200 dark:bg-slate-900/80 dark:text-slate-100 dark:ring-slate-700 dark:hover:bg-slate-900 dark:hover:ring-indigo-500/60"
               >
-                <div className="flex justify-between items-start mb-1 gap-2">
+                <div className="mb-1 flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     {/* Main order number: #001 */}
-                    <div className="text-sm font-extrabold text-gray-900">
+                    <div className="text-xl font-extrabold text-slate-900 dark:text-slate-50">
                       #{o.order_no}
                     </div>
                     {/* Created time + POS ref */}
-                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 dark:text-slate-400">
                       {createdAtLabel && (
                         <span className="flex items-center gap-1">
                           <span>🕒</span>
@@ -560,7 +595,7 @@ function OrderColumn({
                         </span>
                       )}
                       {o.pos_ref && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-600">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600 dark:bg-slate-800 dark:text-slate-200">
                           <span className="font-semibold">POS</span>
                           <span className="truncate">{o.pos_ref}</span>
                         </span>
@@ -573,28 +608,28 @@ function OrderColumn({
                     <QRCodeCanvas
                       value={customerUrl}
                       size={52}
-                      className="cursor-pointer"
+                      className="cursor-pointer rounded bg-white dark:bg-slate-50"
                       onClick={() => onShowQr && onShowQr(customerUrl)}
                     />
 
-                    <Link
-                      to={customerUrl}
+                    <a
+                      href={customerUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[9px] text-gray-400 underline"
+                      className="text-[9px] text-slate-400 underline underline-offset-2 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 break-all"
                     >
                       {t("open_customer_page") || "Open page"}
-                    </Link>
+                    </a>
                   </div>
                 </div>
 
                 {renderItemsSummary(o)}
 
-                <div className="mt-2 flex flex-wrap gap-2 justify-end">
+                <div className="mt-2 flex flex-wrap justify-end gap-2">
                   {onReady && (
                     <button
                       onClick={() => onReady(o)}
-                      className="border border-blue-500 text-blue-600 px-2 py-1 rounded hover:bg-blue-50 text-[11px]"
+                      className="rounded-full border border-sky-400 px-2 py-1 text-[11px] font-medium text-sky-600 hover:bg-sky-50 dark:border-sky-500/70 dark:text-sky-200 dark:hover:bg-sky-950/40"
                     >
                       {t("mark_ready") || "Mark ready"}
                     </button>
@@ -602,7 +637,7 @@ function OrderColumn({
                   {onDone && (
                     <button
                       onClick={() => onDone(o)}
-                      className="border border-green-500 text-green-600 px-2 py-1 rounded hover:bg-green-50 text-[11px]"
+                      className="rounded-full border border-emerald-400 px-2 py-1 text-[11px] font-medium text-emerald-600 hover:bg-emerald-50 dark:border-emerald-500/70 dark:text-emerald-200 dark:hover:bg-emerald-950/40"
                     >
                       {t("mark_done") || "Mark done"}
                     </button>

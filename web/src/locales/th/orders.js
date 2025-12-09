@@ -36,6 +36,7 @@ const orders = {
 
   view_qr: "ดู QR ขนาดใหญ่",
   open_customer_page: "เปิดหน้าต่างลูกค้า",
+  orders_subtitle: "จัดการออเดอร์ที่เข้ามาและอัพเดทสถานะแบบเรียลไทม์",
 };
 
 export default orders;

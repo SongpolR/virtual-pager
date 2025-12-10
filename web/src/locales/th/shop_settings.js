@@ -34,6 +34,15 @@ const shop_settings = {
     toy_telephone: "โทรศัพท์ของเล่น",
     urgent: "เร่งด่วน",
   },
+
+  shop_settings_subtitle:
+    "ตั้งค่าข้อมูลร้าน ระบบแจ้งเตือน เสียงเรียกคิว โซนเวลา และสิทธิ์การเข้าถึงของพนักงาน",
+  shop_info_title: "ข้อมูลร้านค้า",
+  logo_placeholder: "อัปโหลดโลโก้",
+  edit_logo: "แก้ไขโลโก้",
+  clear_logo: "ล้างโลโก้",
+  preview_sound: "ลองฟังเสียง",
+  timezone_helper: "ใช้กำหนดเวลาแสดงในออเดอร์และการแจ้งเตือนต่าง ๆ",
 };
 
 export default shop_settings;

@@ -43,7 +43,7 @@ function TopNav({ role }) {
         {/* ---------- App Icon + Name (Responsive) ---------- */}
         <Link
           to="/orders"
-          className="group flex items-center gap-2 rounded px-1 py-1 sm:px-2 sm:py-2 bg-indigo-400/5"
+          className="group flex items-center gap-2 rounded px-1 py-1 sm:px-2 sm:py-2 light:bg-indigo-400/5"
           onClick={closeMenu}
         >
           <div className="relative h-8 w-8">

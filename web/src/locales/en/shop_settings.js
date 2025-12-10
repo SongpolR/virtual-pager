@@ -34,6 +34,15 @@ const shop_settings = {
     toy_telephone: "Toy Telephone",
     urgent: "Urgent",
   },
+
+  shop_settings_subtitle:
+    "Configure your shop info, notification sounds, timezone, and staff access.",
+  shop_info_title: "Shop profile",
+  logo_placeholder: "Upload logo",
+  edit_logo: "Edit logo",
+  clear_logo: "Clear logo",
+  preview_sound: "Preview sound",
+  timezone_helper: "Used for order timestamps and notifications.",
 };
 
 export default shop_settings;

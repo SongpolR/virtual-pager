@@ -87,6 +87,8 @@ const common = {
     9000: "Unexpected error occurred.",
     9001: "Network error. Please try again.",
   },
+
+  timezone: "Timezone",
 };
 
 export default common;

@@ -1,5 +1,6 @@
 // web/src/components/ConfirmModal.jsx
 import React from "react";
+import Dialog from "./Dialog";
 
 export default function ConfirmModal({
   open,
@@ -9,34 +10,62 @@ export default function ConfirmModal({
   cancelLabel = "Cancel",
   onConfirm,
   onCancel,
+
+  // optional
+  variant = "danger", // 'danger' | 'primary' | 'neutral'
 }) {
-  if (!open) return null;
+  const confirmBtnClass =
+    variant === "primary"
+      ? "bg-indigo-500 hover:bg-indigo-400 shadow-indigo-500/30 focus-visible:ring-indigo-300"
+      : variant === "neutral"
+      ? "bg-slate-900 hover:bg-slate-800 shadow-slate-900/20 focus-visible:ring-slate-300 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-200"
+      : "bg-red-500 hover:bg-red-400 shadow-red-500/30 focus-visible:ring-red-300";
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[2000]">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-xs text-center">
-        {title && <h2 className="text-lg font-semibold mb-3">{title}</h2>}
+    <Dialog
+      open={open}
+      onClose={onCancel}
+      title={title}
+      description={message}
+      size="sm"
+      closeOnBackdrop={true}
+      closeOnEsc={true}
+      showCloseButton={false}
+      ariaLabelledById="confirm-title"
+      ariaDescribedById="confirm-desc"
+    >
+      <div className="flex items-center justify-end gap-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="
+            inline-flex items-center justify-center
+            rounded-full px-4 py-2 text-sm font-medium
+            border border-slate-300 bg-white text-slate-700
+            shadow-sm transition
+            hover:bg-slate-50
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300
+            dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200
+            dark:hover:bg-slate-800
+          "
+        >
+          {cancelLabel}
+        </button>
 
-        {message && <p className="text-sm text-gray-600 mb-6">{message}</p>}
-
-        <div className="flex items-center justify-center gap-3">
-          <button
-            type="button"
-            className="px-4 py-2 text-sm rounded-md border border-gray-300 hover:bg-gray-100"
-            onClick={onCancel}
-          >
-            {cancelLabel}
-          </button>
-
-          <button
-            type="button"
-            className="px-4 py-2 text-sm rounded-md bg-red-500 text-white hover:bg-red-600"
-            onClick={onConfirm}
-          >
-            {confirmLabel}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onConfirm}
+          className={[
+            "inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold text-white",
+            "shadow-md transition",
+            "hover:-translate-y-[1px] active:translate-y-0 active:scale-[0.98]",
+            "focus-visible:outline-none focus-visible:ring-2",
+            confirmBtnClass,
+          ].join(" ")}
+        >
+          {confirmLabel}
+        </button>
       </div>
-    </div>
+    </Dialog>
   );
 }

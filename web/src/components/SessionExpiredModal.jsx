@@ -1,44 +1,51 @@
 // web/src/components/SessionExpiredModal.jsx
 import React from "react";
 import { useTranslation } from "react-i18next";
+import Dialog from "./Dialog";
 
-function SessionExpiredModal({ open }) {
+export default function SessionExpiredModal({ open }) {
   const { t } = useTranslation("common");
+
   if (!open) return null;
 
   const handleOk = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("tokenType");
     localStorage.removeItem("user");
     window.location.href = "/login";
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60"
-      aria-modal="true"
-      role="dialog"
+    <Dialog
+      open={open}
+      onClose={null} // ❌ cannot close manually
+      title={t("session_expired_title")}
+      description={t("session_expired_message")}
+      size="sm"
+      closeOnBackdrop={false}
+      closeOnEsc={false}
+      showCloseButton={false}
+      ariaLabelledById="session-expired-title"
+      ariaDescribedById="session-expired-desc"
     >
-      <div className="bg-white rounded-lg shadow-lg max-w-sm w-full mx-4 p-6">
-        <h2 className="text-lg font-semibold mb-3">
-          {t("session_expired_title")}
-        </h2>
-
-        <p className="text-sm text-gray-700 mb-6">
-          {t("session_expired_message")}
-        </p>
-
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={handleOk}
-            className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
-          >
-            {t("ok")}
-          </button>
-        </div>
+      <div className="mt-2 flex justify-end">
+        <button
+          type="button"
+          onClick={handleOk}
+          className="
+            inline-flex items-center justify-center
+            rounded-full px-5 py-2 text-sm font-semibold
+            bg-indigo-500 text-white
+            shadow-md shadow-indigo-500/30
+            transition
+            hover:-translate-y-[1px] hover:bg-indigo-400
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300
+            active:translate-y-0 active:scale-[0.98]
+          "
+        >
+          {t("ok")}
+        </button>
       </div>
-    </div>
+    </Dialog>
   );
 }
-
-export default SessionExpiredModal;

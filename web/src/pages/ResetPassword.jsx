@@ -95,7 +95,7 @@ export default function ResetPassword() {
         }
 
         showToast({ type: "success", message: t("reset_password_success") });
-        navigate("/login", { replace: true });
+        navigate(`/login?mode=owner&email=${email}`, { replace: true });
         return;
       }
 
@@ -134,11 +134,11 @@ export default function ResetPassword() {
       <form onSubmit={submit}>
         {/* Email pill */}
         {email && (
-          <div className="mb-4 inline-flex max-w-full items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700 dark:bg-slate-900 dark:text-slate-200">
+          <div className="mb-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
             <span className="text-slate-500 dark:text-slate-400">
-              {t("common:email")}:
-            </span>
-            <span className="truncate font-mono">{email}</span>
+              {t("common:email") || "Email"}:
+            </span>{" "}
+            <span className="font-mono">{email}</span>
           </div>
         )}
 

@@ -187,7 +187,7 @@ export default function StaffResetPassword() {
       <form onSubmit={submit}>
         {/* Email pill */}
         {email && (
-          <div className="mb-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+          <div className="mb-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
             <span className="text-slate-500 dark:text-slate-400">
               {t("common:email") || "Email"}:
             </span>{" "}

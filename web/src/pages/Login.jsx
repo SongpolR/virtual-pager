@@ -182,7 +182,14 @@ export default function Login() {
   return (
     <AuthLayout title={t("login")} subtitle={subtitle} headerRight={modeToggle}>
       <form onSubmit={submit}>
-        {errBlock && <LoginErrorPanel {...errBlock} t={t} />}
+        {errBlock && (
+          <LoginErrorPanel
+            code={errBlock.code}
+            mode={errBlock.mode}
+            email={form.email}
+            t={t}
+          />
+        )}
 
         {/* Email */}
         <label className="mt-2 block text-xs font-medium text-slate-700 dark:text-slate-300">

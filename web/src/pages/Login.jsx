@@ -408,6 +408,13 @@ function LoginErrorPanel({ code, email, mode, t }) {
         </>
       );
     }
+    if (code === "SHOP_NOT_FOUND") {
+      return wrap(
+        <>
+          {t("login_staff_shop_not_found")} {t("login_staff_contact_owner")}
+        </>
+      );
+    }
     return wrap(
       <>
         {t("common:errors.9000")} {t("login_staff_contact_owner")}

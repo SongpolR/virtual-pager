@@ -24,6 +24,7 @@ const auth = {
   login_staff_inactive: "บัญชีพนักงานถูกปิดใช้งาน",
   switch_to_owner_login: "สลับไปเข้าสู่ระบบเจ้าของร้าน",
   login_staff_bad_password: "รหัสผ่านไม่ถูกต้อง",
+  login_staff_shop_not_found: "ไม่พบร้านค้าดังกล่าว",
   login_staff_contact_owner: "กรุณาติดต่อเจ้าของร้าน",
 
   // Signup

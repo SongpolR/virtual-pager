@@ -400,7 +400,7 @@ export default function Customer() {
               <div className="h-9 w-9 rounded-full bg-indigo-500/10 ring-1 ring-indigo-500/20 dark:bg-indigo-400/10 dark:ring-indigo-400/20" />
               <div className="min-w-0">
                 <div className="text-xs font-semibold text-slate-800 dark:text-slate-100">
-                  {t("title") || "Virtual Pager"}
+                  {t("shop") || "Virtual Pager"}
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
                   {t("errors.title") || "Something went wrong"}
@@ -438,7 +438,7 @@ export default function Customer() {
               <div className="h-9 w-9 rounded-full bg-slate-500/10 ring-1 ring-slate-500/20 dark:bg-slate-400/10 dark:ring-slate-400/20" />
               <div className="min-w-0">
                 <div className="text-xs font-semibold text-slate-800 dark:text-slate-100">
-                  {t("title") || "Virtual Pager"}
+                  {t("shop") || "Virtual Pager"}
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
                   {t("errors.order_not_found")}
@@ -493,15 +493,20 @@ export default function Customer() {
       <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/60">
         <div className="mx-auto flex max-w-xl items-center gap-3 px-4 py-3">
           {/* Shop avatar */}
-          {shop?.logo_url ? (
+          <div className="relative h-10 w-10">
+            {/* Pulsing ring behind the icon */}
+            <span
+              aria-hidden="true"
+              className="animate-pulse-ring absolute inset-0 rounded-full border border-indigo-400/60 dark:border-indigo-300/50"
+            />
             <img
               src={shop.logo_url}
               alt={shop.name}
-              className="h-10 w-10 rounded-full border border-slate-200 object-cover dark:border-slate-700"
+              width={32}
+              height={32}
+              className="relative h-10 w-10 rounded-full bg-indigo-600 ring-1 ring-slate-200 transition-transform duration-200 group-hover:scale-105 group-active:scale-95 dark:bg-indigo-500 dark:ring-slate-700"
             />
-          ) : (
-            <div className="h-10 w-10 rounded-full bg-indigo-500/10 ring-1 ring-indigo-500/20 dark:bg-indigo-400/10 dark:ring-indigo-400/20" />
-          )}
+          </div>
 
           <div className="min-w-0 flex-1">
             <div className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
@@ -518,7 +523,7 @@ export default function Customer() {
           {/* Connection dot */}
           <span
             className={[
-              "hidden sm:inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold",
+              "hidden sm:inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-semibold",
               isSocketConnected
                 ? "bg-emerald-500/10 text-emerald-700 ring-1 ring-emerald-500/20 dark:bg-emerald-400/10 dark:text-emerald-200 dark:ring-emerald-400/20"
                 : "bg-slate-500/10 text-slate-700 ring-1 ring-slate-500/20 dark:bg-slate-400/10 dark:text-slate-200 dark:ring-slate-400/20",

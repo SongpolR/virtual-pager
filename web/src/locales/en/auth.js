@@ -25,6 +25,7 @@ const auth = {
   login_staff_invite_pending: "Your staff account has not been activated yet.",
   login_staff_inactive: "This staff account is inactive.",
   login_staff_bad_password: "Incorrect password.",
+  login_staff_shop_not_found: "Shop not found.",
   switch_to_owner_login: "Switch to Owner login",
   login_staff_contact_owner: "Please contact your shop owner to continue.",
 

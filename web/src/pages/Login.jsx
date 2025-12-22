@@ -251,9 +251,28 @@ export default function Login() {
               type="text"
               required
               value={form.shop_code}
-              onChange={(e) => updateField("shop_code", e.target.value)}
+              onChange={(e) => {
+                // 1) uppercase
+                let v = e.target.value.toUpperCase();
+
+                // 2) keep only A-Z and 0-9
+                v = v.replace(/[^A-Z0-9]/g, "");
+
+                // 3) max 12 chars (6 + 6)
+                v = v.slice(0, 12);
+
+                // 4) insert dash after 6
+                if (v.length > 6) v = `${v.slice(0, 6)}-${v.slice(6)}`;
+
+                updateField("shop_code", v);
+              }}
+              inputMode="text"
+              autoCapitalize="characters"
+              maxLength={13} // XXXXXX-XXXXXX
+              pattern="[A-Za-z0-9]{6}-[A-Za-z0-9]{6}"
+              title="Format: XXXXXX-XXXXXX (A-Z, 0-9 only)"
               className={[
-                "mt-1 w-full rounded-lg border p-2.5 text-sm",
+                "mt-1 w-full rounded-lg border p-2.5 text-sm uppercase",
                 "bg-white text-slate-900 placeholder:text-slate-400",
                 "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 focus:ring-offset-slate-100",
                 "dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500",
@@ -264,6 +283,7 @@ export default function Login() {
               ].join(" ")}
               placeholder="MYSHOP-123456"
             />
+
             <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
               {t("shop_code_login_hint") ||
                 "This code is used for staff login. You can share it with your staff."}

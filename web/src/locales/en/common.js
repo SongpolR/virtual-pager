@@ -95,6 +95,13 @@ const common = {
   remove: "Remove",
   copy: "Copy",
   shop_code: "Shop code",
+  not_found_title: "Page not found",
+  not_found_subtitle:
+    "The page you’re looking for doesn’t exist or has been moved.",
+  not_found_hint:
+    "If you followed a link, it might be outdated. Try going back to the home page or login.",
+  go_home: "Go to Home",
+  path: "Path",
 };
 
 export default common;

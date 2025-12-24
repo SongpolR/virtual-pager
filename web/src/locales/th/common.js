@@ -93,6 +93,12 @@ const common = {
   remove: "ลบ",
   copy: "คัดลอก",
   shop_code: "รหัสร้านค้า",
+  not_found_title: "ไม่พบหน้านี้",
+  not_found_subtitle: "หน้าเพจที่คุณต้องการอาจถูกย้ายหรือไม่มีอยู่แล้ว",
+  not_found_hint:
+    "หากคุณเข้ามาจากลิงก์ อาจเป็นลิงก์เก่า ลองกลับไปหน้าแรกหรือเข้าสู่ระบบอีกครั้ง",
+  go_home: "ไปหน้าแรก",
+  path: "Path",
 };
 
 export default common;

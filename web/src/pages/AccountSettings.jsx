@@ -39,6 +39,16 @@ export default function AccountSettings() {
     }
   }, [navigate, loggingOut]);
 
+  const handleStaffClick = (e) => {
+    e.preventDefault(); // block navigation
+    showToast({
+      type: "info",
+      message:
+        t("account:contact_owner_to_change_password") ||
+        "Please contact the shop owner to change your password.",
+    });
+  };
+
   return (
     <div className="mt-4 space-y-4 text-slate-900 dark:text-slate-100">
       {/* Logout Confirmation Modal */}
@@ -118,26 +128,23 @@ export default function AccountSettings() {
 
           {/* Actions */}
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            {/* <Link
-              to="/orders"
-              className="group flex items-center gap-2 rounded px-1 py-1 sm:px-2 sm:py-2 light:bg-indigo-400/5"
-              onClick={closeMenu}
-            ></Link> */}
-            <Link
-              type="button"
-              className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-800"
-              // onClick={() =>
-              //   showToast({
-              //     type: "info",
-              //     message:
-              //       t("account:change_password_coming_soon") ||
-              //       "Change password will be added soon.",
-              //   })
-              // }
-              to="/settings/account/change-password"
-            >
-              {t("account:change_password") || "Change password"}
-            </Link>
+            {role === "owner" ? (
+              <Link
+                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-800"
+                to="/settings/account/change-password"
+              >
+                {t("account:change_password") || "Change password"}
+              </Link>
+            ) : (
+              <Link
+                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-800"
+                to="#"
+                onClick={handleStaffClick}
+                aria-disabled="true"
+              >
+                {t("account:change_password") || "Change password"}
+              </Link>
+            )}
 
             <button
               type="button"

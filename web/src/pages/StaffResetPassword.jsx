@@ -10,6 +10,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "../components/ToastProvider";
 import AuthLayout from "../components/layout/AuthLayout.jsx";
+import CopyIcon from "../components/icons/CopyIcon.jsx";
 
 const pwOk = (pw) => ({
   length: pw.length >= 8,
@@ -27,6 +28,7 @@ export default function StaffResetPassword() {
   const params = new URLSearchParams(location.search);
   const email = params.get("email") || "";
   const token = params.get("token") || "";
+  const shopCode = params.get("shop_code") || "";
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -134,9 +136,14 @@ export default function StaffResetPassword() {
         });
 
         // go to staff login prefilled
-        navigate(`/login?mode=staff&email=${encodeURIComponent(email)}`, {
-          replace: true,
-        });
+        navigate(
+          `/login?mode=staff&email=${encodeURIComponent(
+            email
+          )}&shop_code=${shopCode}`,
+          {
+            replace: true,
+          }
+        );
         return;
       }
 
@@ -182,6 +189,37 @@ export default function StaffResetPassword() {
     t("staff_reset_subtitle") ||
     "Set a new password to regain access to your staff account";
 
+  const copyShopCode = async () => {
+    if (!shopCode) return;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shopCode);
+      } else {
+        // fallback
+        const ta = document.createElement("textarea");
+        ta.value = shopCode;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+
+      showToast({
+        type: "success",
+        message: t("shop_settings:shop_code_copied") || "Copied",
+      });
+    } catch (e) {
+      showToast({
+        type: "error",
+        message: t("shop_settings:shop_code_copy_failed") || "Copy failed",
+      });
+    }
+  };
+
   return (
     <AuthLayout title={t("reset_password")} subtitle={subtitle}>
       <form onSubmit={submit}>
@@ -191,7 +229,38 @@ export default function StaffResetPassword() {
             <span className="text-slate-500 dark:text-slate-400">
               {t("common:email") || "Email"}:
             </span>{" "}
-            <span className="font-mono">{email}</span>
+            <span className="font-mono font-bold">{email}</span>
+          </div>
+        )}
+
+        {shopCode && (
+          <div className="mb-3 flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+            <div>
+              <div className="min-w-0">
+                <span className="text-slate-500 dark:text-slate-400">
+                  {t("common:shop_code") || "Shop code"}:
+                </span>{" "}
+                <span className="font-mono font-bold break-all">
+                  {shopCode}
+                </span>
+              </div>
+              <div className="mt-3 text-start text-[11px] text-slate-500 dark:text-slate-400">
+                {t("shop_settings:shop_code_staff_hint") ||
+                  "This code is used for staff login."}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={copyShopCode}
+              className="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+              title={t("common:copy") || "Copy"}
+            >
+              <CopyIcon size={14} />
+              <span className="hidden sm:inline">
+                {t("common:copy") || "Copy"}
+              </span>
+            </button>
           </div>
         )}
 

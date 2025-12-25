@@ -56,6 +56,10 @@
                   <strong>{{ $shopName }}</strong>.
                 </p>
 
+                <p style="margin:0 0 12px;">
+                  Shop code <strong>{{ $shopCode }}</strong>
+                </p>
+
                 <p style="margin:0 0 20px;">
                   Click the button below to set a new password:
                 </p>
@@ -91,6 +95,10 @@
                 <p style="margin:0 0 12px;">
                   เราได้รับคำขอให้ตั้งรหัสผ่านใหม่สำหรับบัญชีพนักงานของคุณในร้าน
                   <strong>{{ $shopName }}</strong>
+                </p>
+
+                <p style="margin:0 0 12px;">
+                  รหัสร้านค้า <strong>{{ $shopCode }}</strong>
                 </p>
 
                 <p style="margin:0 0 20px;">

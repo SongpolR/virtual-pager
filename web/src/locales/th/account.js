@@ -18,6 +18,8 @@ const account = {
   account_settings_subtitle: "จัดการเซสชันและข้อมูลบัญชีพื้นฐานของคุณ",
   profile_section_title: "โปรไฟล์",
   change_password_coming_soon: "ฟีเจอร์เปลี่ยนรหัสผ่านจะเพิ่มในเร็ว ๆ นี้",
+  contact_owner_to_change_password:
+    "กรุณาติดต่อเจ้าของร้านเพื่อเปลี่ยนรหัสผ่าน",
 };
 
 export default account;

@@ -12,6 +12,7 @@ class StaffResetPasswordMail extends Mailable
 
     public string $resetUrl;
     public string $shopName;
+    public string $shopCode;
 
     // Optional / themed variables
     public string $appName;
@@ -24,10 +25,12 @@ class StaffResetPasswordMail extends Mailable
     public function __construct(
         string $resetUrl,
         string $shopName,
+        string $shopCode,
         array $options = []
     ) {
         $this->resetUrl = $resetUrl;
         $this->shopName  = $shopName;
+        $this->shopCode  = $shopCode;
 
         // Defaults (safe for all environments)
         $this->appName     = $options['appName']     ?? config('app.name');
@@ -47,6 +50,7 @@ class StaffResetPasswordMail extends Mailable
             ->with([
                 'resetUrl'        => $this->resetUrl,
                 'shopName'        => $this->shopName,
+                'shopCode'    => $this->shopCode,
                 'supportEmail'    => $this->supportEmail,
                 'appName'         => $this->appName ?? config('app.name'),
                 'logoUrl'         => $this->logoUrl ?? (rtrim(config('app.url'), '/') . '/app-icon.png'),

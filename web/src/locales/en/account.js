@@ -19,6 +19,8 @@ const account = {
     "Manage your session and basic account information.",
   profile_section_title: "Profile",
   change_password_coming_soon: "Change password will be added soon.",
+  contact_owner_to_change_password:
+    "Please contact the shop owner to change your password.",
 };
 
 export default account;

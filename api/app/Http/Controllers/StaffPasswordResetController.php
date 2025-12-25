@@ -29,7 +29,7 @@ class StaffPasswordResetController extends Controller
 
             $frontend = config('app.frontend_origin', 'http://localhost:5173');
             $shop = DB::table('shops')->where('id', $staff->shop_id)->first();
-            $resetUrl = $frontend . '/staff-reset-password?token=' . urlencode($plain) . '&email=' . urlencode($email);
+            $resetUrl = $frontend . '/staff-reset-password?token=' . urlencode($plain) . '&email=' . urlencode($email) . '&shop_code=' . urlencode($shop->code);
 
             $options = [
                 'appName'     => config('app.name'),
@@ -38,7 +38,7 @@ class StaffPasswordResetController extends Controller
                 'expireMinutes' => 60,
                 'supportEmail' => 'support@vipa.com',
             ];
-            Mail::to($email)->send(new \App\Mail\StaffResetPasswordMail($resetUrl, $shop->name, $options));
+            Mail::to($email)->send(new \App\Mail\StaffResetPasswordMail($resetUrl, $shop->name, $shop->code, $options));
         }
 
         // Always OK to avoid account enumeration

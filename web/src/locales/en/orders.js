@@ -5,7 +5,6 @@ const orders = {
   order_number_conflict: "Order number already exists for today.",
   order_invalid_transition: "Cannot change to this status from current state.",
   order_not_found: "Order not found.",
-  refresh: "Refresh",
 
   order_create_title: "Create order",
   order_create_subtitle:

@@ -102,6 +102,7 @@ const common = {
     "If you followed a link, it might be outdated. Try going back to the home page or login.",
   go_home: "Go to Home",
   path: "Path",
+  refresh: "Refresh",
 };
 
 export default common;

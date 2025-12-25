@@ -5,7 +5,6 @@ const orders = {
   order_number_conflict: "มีหมายเลขออเดอร์นี้ในวันนี้แล้ว",
   order_invalid_transition: "ไม่สามารถเปลี่ยนสถานะจากสถานะปัจจุบันได้",
   order_not_found: "ไม่พบออเดอร์นี้",
-  refresh: "รีเฟรช",
 
   order_create_title: "สร้างออเดอร์ใหม่",
   order_create_subtitle:

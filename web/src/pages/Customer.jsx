@@ -707,7 +707,9 @@ export default function Customer() {
         <RefreshIcon size={18} className="text-white" />
 
         {/* Text label only on sm+ */}
-        <span className="hidden sm:inline">{t("refresh") || "Refresh"}</span>
+        <span className="hidden sm:inline">
+          {t("common:refresh") || "Refresh"}
+        </span>
       </button>
     </PageShell>
   );

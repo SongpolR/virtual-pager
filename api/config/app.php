@@ -123,7 +123,5 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    'realtime_url' => env('REALTIME_URL', 'http://localhost:4000'),
-    'realtime_secret' => env('REALTIME_API_SECRET', 'changeme'),
     'frontend_origin' => env('FRONTEND_ORIGIN', 'http://localhost:5173'),
 ];

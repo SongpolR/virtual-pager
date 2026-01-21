@@ -305,16 +305,21 @@ class OrderController extends Controller
     {
         // You can also configure this in config/services.php → 'realtime.url'
         $baseUrl = config('services.realtime.url', env('REALTIME_URL'));
+        $apiSecret  = config('services.realtime.api_secret', env('REALTIME_API_SECRET'));
 
-        if (!$baseUrl) {
-            return; // silently skip if not configured
+        if (!$baseUrl || !$apiSecret) {
+            return;
         }
 
         try {
-            Http::timeout(2)->post(rtrim($baseUrl, '/') . '/broadcast/order-status', [
-                'order_id' => $order->id,
-                'status'   => $order->status,
-            ]);
+            Http::timeout(2)
+                ->withHeaders([
+                    'X-Broadcast-Secret' => $apiSecret,
+                ])
+                ->post(rtrim($baseUrl, '/') . '/broadcast/order-status', [
+                    'order_id' => $order->id,
+                    'status'   => $order->status,
+                ]);
         } catch (\Throwable $e) {
             Log::warning('Realtime broadcast failed', [
                 'order_id' => $order->id,

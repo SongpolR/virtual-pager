@@ -42,6 +42,7 @@ return [
     ],
 
     'realtime' => [
-        'url' => env('REALTIME_URL', 'http://localhost:4000'),
+        'url' => env('REALTIME_URL'),
+        'api_secret' => env('REALTIME_API_SECRET'),
     ],
 ];

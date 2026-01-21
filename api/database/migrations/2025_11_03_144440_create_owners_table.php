@@ -12,7 +12,7 @@ return new class extends Migration {
       $t->string('name')->nullable();
       $t->string('email')->unique();
       $t->string('password'); // bcrypt
-      $t->timestamp('email_verified_at')->nullable()->after('password');
+      $t->timestamp('email_verified_at')->nullable();
       $t->timestamps();
     });
   }

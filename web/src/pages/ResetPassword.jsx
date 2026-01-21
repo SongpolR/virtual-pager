@@ -99,7 +99,7 @@ export default function ResetPassword() {
         return;
       }
 
-      showToast({ type: "error", message: t("errors.9000") });
+      showToast({ type: "error", message: t("common:errors.9000") });
     } catch (err) {
       const status = err?.response?.status;
       const data = err?.response?.data;

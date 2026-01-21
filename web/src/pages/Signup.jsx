@@ -114,9 +114,11 @@ export default function Signup() {
           localStorage.setItem("tokenType", "owner");
           navigate("/", { replace: true });
         } else if (payload?.errors) {
-          alert(payload.errors.map((code) => t(`errors.${code}`)).join("\n"));
+          alert(
+            payload.errors.map((code) => t(`common:errors.${code}`)).join("\n")
+          );
         } else {
-          alert(t("errors.9000"));
+          alert(t("common:errors.9000"));
         }
       }
     };

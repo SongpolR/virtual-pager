@@ -100,8 +100,8 @@ export default function StaffSetup() {
     }
 
     // fallback: errors.<CODE> or generic
-    const key = `errors.${code}`;
-    const msg = t(key) !== key ? t(key) : t("errors.9000");
+    const key = `common:errors.${code}`;
+    const msg = t(key) !== key ? t(key) : t("common:errors.9000");
     showToast({ type: "error", message: msg });
   };
 
@@ -158,7 +158,7 @@ export default function StaffSetup() {
         return;
       }
 
-      showToast({ type: "error", message: t("errors.9000") });
+      showToast({ type: "error", message: t("common:errors.9000") });
     } catch (err) {
       if (!err.response) {
         showToast({ type: "error", message: getGlobalErrorFromAxios(err, t) });

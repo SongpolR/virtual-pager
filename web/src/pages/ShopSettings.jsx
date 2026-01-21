@@ -154,14 +154,14 @@ export default function ShopSettings() {
 
     // Basic type/size checks
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-      const msg = t("errors.1007");
+      const msg = t("common:errors.1007");
       setLogoMeta({ w: null, h: null, error: msg });
       setShopFieldErrors((prev) => ({ ...prev, logo: msg }));
       setLogoPreview(null);
       return;
     }
     if (file.size > MAX_BYTES) {
-      const msg = t("errors.1008");
+      const msg = t("common:errors.1008");
       setLogoMeta({ w: null, h: null, error: msg });
       setShopFieldErrors((prev) => ({ ...prev, logo: msg }));
       setLogoPreview(null);
@@ -176,7 +176,7 @@ export default function ShopSettings() {
       const w = img.naturalWidth;
       const h = img.naturalHeight;
       if (w > MAX_W || h > MAX_H) {
-        const msg = t("errors.1009");
+        const msg = t("common:errors.1009");
         setLogoMeta({ w, h, error: msg });
         setShopFieldErrors((prev) => ({ ...prev, logo: msg }));
       } else {
@@ -185,7 +185,7 @@ export default function ShopSettings() {
       URL.revokeObjectURL(url);
     };
     img.onerror = () => {
-      const msg = t("errors.1007");
+      const msg = t("common:errors.1007");
       setLogoMeta({ w: null, h: null, error: msg });
       setShopFieldErrors((prev) => ({ ...prev, logo: msg }));
       URL.revokeObjectURL(url);
@@ -257,7 +257,7 @@ export default function ShopSettings() {
     const trimmedName = shopName.trim();
 
     if (!trimmedName) {
-      const msg = t("errors.1001");
+      const msg = t("common:errors.1001");
       setShopFieldErrors({ name: msg });
       setSavingShop(false);
       return;
@@ -567,33 +567,33 @@ export default function ShopSettings() {
           confirmCtx?.action === "activate"
             ? t("confirm_activate_title") || "Activate staff?"
             : confirmCtx?.action === "deactivate"
-            ? t("confirm_deactivate_title") || "Deactivate staff?"
-            : t("confirm_remove_title") || "Remove staff?"
+              ? t("confirm_deactivate_title") || "Deactivate staff?"
+              : t("confirm_remove_title") || "Remove staff?"
         }
         message={
           confirmCtx?.action === "activate"
             ? t("confirm_activate_message") ||
               "This staff will be able to access orders and update statuses."
             : confirmCtx?.action === "deactivate"
-            ? t("confirm_deactivate_message") ||
-              "This staff will no longer be able to access the system."
-            : t("confirm_remove_message") ||
-              "This staff will be removed from this shop."
+              ? t("confirm_deactivate_message") ||
+                "This staff will no longer be able to access the system."
+              : t("confirm_remove_message") ||
+                "This staff will be removed from this shop."
         }
         cancelLabel={t("common:cancel") || "Cancel"}
         confirmLabel={
           confirmCtx?.action === "activate"
             ? t("auth:activate") || "Activate"
             : confirmCtx?.action === "deactivate"
-            ? t("auth:deactivate") || "Deactivate"
-            : t("common:remove") || "Remove"
+              ? t("auth:deactivate") || "Deactivate"
+              : t("common:remove") || "Remove"
         }
         variant={
           confirmCtx?.action === "activate"
             ? "info"
             : confirmCtx?.action === "deactivate"
-            ? "warning"
-            : "error"
+              ? "warning"
+              : "error"
         }
         onCancel={closeStaffConfirm}
         onConfirm={async () => {

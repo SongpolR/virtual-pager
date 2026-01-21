@@ -49,9 +49,11 @@ export default function Login() {
           localStorage.setItem("tokenType", "owner");
           navigate("/", { replace: true });
         } else if (payload?.errors) {
-          alert(payload.errors.map((code) => t(`errors.${code}`)).join("\n"));
+          alert(
+            payload.errors.map((code) => t(`common:errors.${code}`)).join("\n")
+          );
         } else {
-          alert(t("errors.9000"));
+          alert(t("common:errors.9000"));
         }
       }
     };
@@ -401,7 +403,7 @@ function LoginErrorPanel({ code, email, mode, t }) {
         </>
       );
     }
-    return wrap(t("errors.9000"));
+    return wrap(t("common:errors.9000"));
   }
 
   // STAFF

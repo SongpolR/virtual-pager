@@ -87,7 +87,7 @@ class AuthController extends Controller
         $options = [
           'appName'     => config('app.name'),
           'expiresMinutes' => 60,
-          'supportEmail' => 'support@vipa.com',
+          'supportEmail' => 'support@vipa-app.online',
         ];
         Mail::to($req->email)->send(new VerifyEmailMail($verifyUrl, $options));
 
@@ -302,7 +302,7 @@ class AuthController extends Controller
       $options = [
         'appName'     => config('app.name'),
         'expiresMinutes' => 60,
-        'supportEmail' => 'support@vipa.com',
+        'supportEmail' => 'support@vipa-app.online',
       ];
       Mail::to($req->email)->send(new VerifyEmailMail($verifyUrl, $options));
 
@@ -371,7 +371,7 @@ class AuthController extends Controller
       $options = [
         'appName'     => config('app.name'),
         'expiresMinutes' => 60,
-        'supportEmail' => 'support@vipa.com',
+        'supportEmail' => 'support@vipa-app.online',
       ];
       Mail::to($owner->email)->send(new ResetPasswordMail($resetUrl, $options));
       return response()->json([

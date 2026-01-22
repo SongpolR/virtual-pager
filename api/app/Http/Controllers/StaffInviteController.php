@@ -99,7 +99,7 @@ class StaffInviteController extends Controller
                 'appSubtitle' => 'Virtual Pager',
                 'logoUrl'     => $shop->logo_url ? $shop->logo_url : (config('app.url') . '/placeholder-rounded.png'),
                 'expireHours' => 72,
-                'supportEmail' => 'support@vipa.com',
+                'supportEmail' => 'support@vipa-app.online',
                 //'footerNote'   => 'Sent by shop owner.',
             ];
 
@@ -293,7 +293,7 @@ class StaffInviteController extends Controller
             'appSubtitle' => 'Virtual Pager',
             'logoUrl'     => $shop->logo_url ? $shop->logo_url : (config('app.url') . '/placeholder-rounded.png'),
             'expireHours' => 72,
-            'supportEmail' => 'support@vipa.com',
+            'supportEmail' => 'support@vipa-app.online',
             //'footerNote'   => 'Sent by shop owner.',
         ];
 

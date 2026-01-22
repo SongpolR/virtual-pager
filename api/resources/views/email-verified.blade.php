@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="{{ $lang ?? 'en' }}">
+<html lang="{{ 'en' }}">
   <head>
     <meta charset="utf-8">
-    <title>{{ $title ?? 'Email Verified' }}</title>
+    <title>{{ 'Email Verified' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
@@ -241,18 +241,18 @@
             <div class="pulseRing"></div>
             <img
               class="appIcon"
-              src="{{ $appIconUrl ?? (config('app.url') . '/app-icon-rounded.png') }}"
-              alt="{{ $appName ?? config('app.name') }}"
+              src="{{ config('app.url') . '/app-icon-rounded.png' }}"
+              alt="{{ config('app.name') }}"
             />
           </div>
 
           <div class="brand">
             <div class="brandTop">
-              <h1 class="title">{{ $heading ?? 'Email Verified' }}</h1>
-              <span class="badge">{{ $badge ?? 'Secure' }}</span>
+              <h1 class="title">{{ 'Email Verified' }}</h1>
+              <span class="badge">{{ 'Secure' }}</span>
             </div>
             <p class="subtitle">
-              {{ $subheading ?? 'This window will close automatically in a few seconds.' }}
+              {{ 'This window will close automatically in a few seconds.' }}
             </p>
           </div>
         </div>
@@ -261,10 +261,10 @@
 
         <div class="content">
           <p class="msg">
-            {{ $messageEn ?? 'Your email has been verified successfully. You can close this window.' }}
+            {{ 'Your email has been verified successfully. You can close this window.' }}
           </p>
           <p class="msg th">
-            {{ $messageTh ?? 'อีเมลของคุณได้รับการยืนยันเรียบร้อยแล้ว คุณสามารถปิดหน้าต่างนี้ได้' }}
+            {{ 'อีเมลของคุณได้รับการยืนยันเรียบร้อยแล้ว คุณสามารถปิดหน้าต่างนี้ได้' }}
           </p>
 
           <div class="countRow">
@@ -285,26 +285,18 @@
 
         <div class="footer">
           <div>
-            {{ $footerEn ?? "If this tab doesn't close automatically, you can safely close it yourself." }}
+            {{ "If this tab doesn't close automatically, you can safely close it yourself." }}
           </div>
           <div style="margin-top:4px;">
-            {{ $footerTh ?? "หากแท็บไม่ปิดเอง ให้คุณปิดหน้าต่างนี้ได้เลย" }}
+            {{ "หากแท็บไม่ปิดเอง ให้คุณปิดหน้าต่างนี้ได้เลย" }}
           </div>
-
-          @if(!empty($loginUrl))
-            <div style="margin-top:10px;">
-              <a href="{{ $loginUrl }}">Go to login</a>
-              <span style="opacity:.8;">•</span>
-              <a href="{{ $loginUrl }}">ไปหน้าเข้าสู่ระบบ</a>
-            </div>
-          @endif
         </div>
       </div>
     </div>
 
     <script>
       (function () {
-        var TOTAL_SECONDS = Number({{ (int)($seconds ?? 5) }});
+        var TOTAL_SECONDS = Number({{ (int)(5) }});
         var remaining = TOTAL_SECONDS;
 
         var countdownEl = document.getElementById("countdown");
@@ -323,11 +315,6 @@
 
           if (remaining === 0) {
             try { window.close(); } catch (e) {}
-            // fallback redirect if window.close() blocked
-            var redirect = "{{ $redirectUrl ?? '' }}";
-            if (redirect) {
-              setTimeout(function(){ window.location.href = redirect; }, 200);
-            }
           }
         }
 

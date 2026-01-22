@@ -87,7 +87,6 @@ class AuthController extends Controller
         $options = [
           'appName'     => config('app.name'),
           'expiresMinutes' => 60,
-          'supportEmail' => config('app.support_email'),
         ];
         Mail::to($req->email)->send(new VerifyEmailMail($verifyUrl, $options));
 
@@ -302,7 +301,6 @@ class AuthController extends Controller
       $options = [
         'appName'     => config('app.name'),
         'expiresMinutes' => 60,
-        'supportEmail' => config('app.support_email'),
       ];
       Mail::to($req->email)->send(new VerifyEmailMail($verifyUrl, $options));
 
@@ -370,8 +368,7 @@ class AuthController extends Controller
       $resetUrl = $frontend . '/reset-password?token=' . urlencode($plain) . '&email=' . urlencode($owner->email);
       $options = [
         'appName'     => config('app.name'),
-        'expiresMinutes' => 60,
-        'supportEmail' => config('app.support_email'),
+        'expiresMinutes' => 60,),
       ];
       Mail::to($owner->email)->send(new ResetPasswordMail($resetUrl, $options));
       return response()->json([

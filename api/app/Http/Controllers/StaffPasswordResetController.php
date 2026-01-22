@@ -35,7 +35,6 @@ class StaffPasswordResetController extends Controller
                 'appName'     => config('app.name'),
                 'appSubtitle' => config('app.fullname'),
                 'expireMinutes' => 60,
-                'supportEmail' => config('app.support_email'),
             ];
             Mail::to($email)->send(new \App\Mail\StaffResetPasswordMail($resetUrl, $shop->name, $shop->code, $options));
         }

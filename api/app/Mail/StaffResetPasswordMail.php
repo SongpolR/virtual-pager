@@ -18,7 +18,6 @@ class StaffResetPasswordMail extends Mailable
     public string $appName;
     public string $appSubtitle;
     public int $expiresMinutes;
-    public ?string $supportEmail;
 
     public function __construct(
         string $resetUrl,
@@ -34,7 +33,6 @@ class StaffResetPasswordMail extends Mailable
         $this->appName     = $options['appName']     ?? config('app.name');
         $this->appSubtitle = $options['appSubtitle'] ?? config('app.fullname');
         $this->expiresMinutes = $options['expiresMinutes'] ?? 60;
-        $this->supportEmail = $options['supportEmail'] ?? config('app.support_email.');
     }
 
     public function build()
@@ -47,7 +45,6 @@ class StaffResetPasswordMail extends Mailable
                 'resetUrl'        => $this->resetUrl,
                 'shopName'        => $this->shopName,
                 'shopCode'    => $this->shopCode,
-                'supportEmail'    => $this->supportEmail,
                 'appName'         => $this->appName,
                 'appSubtitle' => $this->appSubtitle,
                 'expiresMinutes'  => $this->expiresMinutes,

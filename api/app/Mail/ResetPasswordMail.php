@@ -14,8 +14,6 @@ class ResetPasswordMail extends Mailable
   public int $expiresMinutes;
   public string $appName;
 
-  public ?string $supportEmail;
-
   public function __construct(
     string $resetUrl,
     array $options = []
@@ -23,7 +21,6 @@ class ResetPasswordMail extends Mailable
     $this->resetUrl = $resetUrl;
     $this->expiresMinutes = $options['expiresMinutes'] ?? 60;
     $this->appName     = $options['appName']     ?? config('app.name');
-    $this->supportEmail = $options['supportEmail'] ?? config('app.support_email');
   }
 
   public function build()
@@ -35,7 +32,6 @@ class ResetPasswordMail extends Mailable
         'resetUrl'       => $this->resetUrl,
         'expiresMinutes' => $this->expiresMinutes,
         'appName'        => $this->appName,
-        'supportEmail' => $this->supportEmail,
       ]);
   }
 }

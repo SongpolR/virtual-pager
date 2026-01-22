@@ -123,13 +123,11 @@
                   </a>
                 </p>
 
-                @if(!empty($supportEmail))
-                  <p style="margin:16px 0 0; font-size:12px; color:#64748b;">
-                    Need help? Contact us at<br>
-                    ต้องการความช่วยเหลือ ติดต่อเราได้ที่:
-                    <a href="mailto:{{ $supportEmail }}">{{ $supportEmail }}</a>
-                  </p>
-                @endif
+                <p style="margin:16px 0 0; font-size:12px; color:#64748b;">
+                  Need help? Contact us at<br>
+                  ต้องการความช่วยเหลือ ติดต่อเราได้ที่:
+                  <a href="mailto:{{ config('mail.reply_to.address') }}">{{ config('mail.reply_to.address') }}</a>
+                </p>
 
               </td>
             </tr>

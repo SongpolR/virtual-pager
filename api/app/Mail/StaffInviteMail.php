@@ -18,7 +18,6 @@ class StaffInviteMail extends Mailable
   public string $appName;
   public string $appSubtitle;
   public int $expireHours;
-  public ?string $supportEmail;
 
   /**
    * Create a new message instance.
@@ -37,7 +36,6 @@ class StaffInviteMail extends Mailable
     $this->appName     = $options['appName']     ?? config('app.name');
     $this->appSubtitle = $options['appSubtitle'] ?? config('app.fullname');
     $this->expireHours = $options['expireHours'] ?? 72;
-    $this->supportEmail = $options['supportEmail'] ?? config('app.support_email');
   }
 
   /**
@@ -55,7 +53,6 @@ class StaffInviteMail extends Mailable
         'appName'     => $this->appName,
         'appSubtitle' => $this->appSubtitle,
         'expireHours' => $this->expireHours,
-        'supportEmail' => $this->supportEmail,
       ]);
   }
 }

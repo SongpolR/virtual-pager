@@ -97,7 +97,6 @@ class StaffInviteController extends Controller
                 'appName'     => config('app.name'),
                 'appSubtitle' => config('app.fullname'),
                 'expireHours' => 72,
-                'supportEmail' => config('app.support_email'),
             ];
 
             Mail::to($email)->send(new StaffInviteMail($acceptUrl, $shop->name, $shop->code, $options));
@@ -288,7 +287,6 @@ class StaffInviteController extends Controller
             'appName'     => config('app.name'),
             'appSubtitle' => config('app.fullname'),
             'expireHours' => 72,
-            'supportEmail' => config('app.support_email'),
         ];
 
         Mail::to($email)->send(new StaffInviteMail($acceptUrl, $shop->name, $shop->code, $options));

@@ -13,15 +13,12 @@ class VerifyEmailMail extends Mailable
   public string $verifyUrl;
   public string $appName;
   public int $expiresMinutes;
-  public ?string $supportEmail;
-
 
   public function __construct(string $verifyUrl, array $options = [])
   {
     $this->verifyUrl    = $verifyUrl;
     $this->expiresMinutes = $options['expiresMinutes'] ?? 60;
     $this->appName     = $options['appName'] ?? config('app.name');
-    $this->supportEmail = $options['supportEmail'] ?? config('app.support_email');
   }
 
   public function build()
@@ -33,7 +30,6 @@ class VerifyEmailMail extends Mailable
         'verifyUrl'    => $this->verifyUrl,
         'expiresMinutes'      => $this->expiresMinutes,
         'appName'      => $this->appName,
-        'supportEmail' => $this->supportEmail,
       ]);
   }
 }

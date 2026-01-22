@@ -17,10 +17,8 @@ class StaffResetPasswordMail extends Mailable
     // Optional / themed variables
     public string $appName;
     public string $appSubtitle;
-    public string $logoUrl;
     public int $expiresMinutes;
     public ?string $supportEmail;
-    public ?string $footerNote;
 
     public function __construct(
         string $resetUrl,
@@ -34,11 +32,9 @@ class StaffResetPasswordMail extends Mailable
 
         // Defaults (safe for all environments)
         $this->appName     = $options['appName']     ?? config('app.name');
-        $this->appSubtitle = $options['appSubtitle'] ?? 'Virtual Pager';
-        $this->logoUrl     = $options['logoUrl']     ?? (config('app.url') . '/app-icon.png');
+        $this->appSubtitle = $options['appSubtitle'] ?? config('app.fullname');
         $this->expiresMinutes = $options['expiresMinutes'] ?? 60;
-        $this->supportEmail = $options['supportEmail'] ?? null;
-        $this->footerNote   = $options['footerNote'] ?? null;
+        $this->supportEmail = $options['supportEmail'] ?? config('app.support_email.');
     }
 
     public function build()
@@ -52,8 +48,8 @@ class StaffResetPasswordMail extends Mailable
                 'shopName'        => $this->shopName,
                 'shopCode'    => $this->shopCode,
                 'supportEmail'    => $this->supportEmail,
-                'appName'         => $this->appName ?? config('app.name'),
-                'logoUrl'         => $this->logoUrl ?? (rtrim(config('app.url'), '/') . '/app-icon.png'),
+                'appName'         => $this->appName,
+                'appSubtitle' => $this->appSubtitle,
                 'expiresMinutes'  => $this->expiresMinutes,
             ]);
     }

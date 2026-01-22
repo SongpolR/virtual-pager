@@ -21,7 +21,7 @@ class VerifyEmailMail extends Mailable
     $this->verifyUrl    = $verifyUrl;
     $this->expiresMinutes = $options['expiresMinutes'] ?? 60;
     $this->appName     = $options['appName'] ?? config('app.name');
-    $this->supportEmail = $options['supportEmail'] ?? null;
+    $this->supportEmail = $options['supportEmail'] ?? config('app.support_email');
   }
 
   public function build()

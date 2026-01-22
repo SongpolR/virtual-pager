@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'fullname' => env('APP_FULLNAME', 'Laravel App'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
@@ -124,4 +126,5 @@ return [
     ],
 
     'frontend_origin' => env('FRONTEND_ORIGIN', 'http://localhost:5173'),
+    'support_email' => env('SUPPORT_EMAIL', 'support@email.com'),
 ];

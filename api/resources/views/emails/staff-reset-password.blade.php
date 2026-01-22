@@ -18,13 +18,9 @@
             <tr>
               <td style="padding:24px;">
                 <div style="text-align:center;">
-                  <img
-                    src="{{ config('app.url') }}/app-icon.png"
-                    alt="{{ $appName }}"
-                    width="160"
-                    height="60"
-                    style="display:block; margin:0 auto;"
-                  />
+                  <div style="margin-top:2px; font-size:24px; font-weight:700; color:#4f46e5;">
+                    VIPA
+                  </div>
                   <!-- App name -->
                   <div style="font-size:14px; font-weight:500; color:#94a3b8; text-align:center;">
                     {{ $appSubtitle }}

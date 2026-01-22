@@ -33,10 +33,9 @@ class StaffPasswordResetController extends Controller
 
             $options = [
                 'appName'     => config('app.name'),
-                'appSubtitle' => 'Virtual Pager',
-                'logoUrl'     => $shop->logo_url ? $shop->logo_url : (config('app.url') . '/app-icon.png'),
+                'appSubtitle' => config('app.fullname'),
                 'expireMinutes' => 60,
-                'supportEmail' => 'support@vipa-app.online',
+                'supportEmail' => config('app.support_email'),
             ];
             Mail::to($email)->send(new \App\Mail\StaffResetPasswordMail($resetUrl, $shop->name, $shop->code, $options));
         }

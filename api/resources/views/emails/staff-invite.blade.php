@@ -25,13 +25,9 @@
               <td style="padding:24px; text-align:left;">
                 <div>
                   <!-- Logo -->
-                  <img
-                    src="{{ config('app.url') }}/app-icon.png"
-                    alt="{{ $appName }}"
-                    width="160"
-                    height="60"
-                    style="display:block; margin:0 auto;"
-                  />
+                  <div style="margin-top:2px; font-size:24px; font-weight:700; color:#4f46e5;">
+                    VIPA
+                  </div>
                   <!-- App name -->
                   <div style="font-size:14px; font-weight:500; color:#94a3b8; text-align:center;">
                     {{ $appSubtitle }}
@@ -48,13 +44,6 @@
             <!-- Content -->
             <tr>
               <td style="padding:24px; color:#334155; font-size:14px; line-height:1.6;">
-
-                <img
-                  src="{{ $logoUrl }}"
-                  alt="{{ $appName }}"
-                  height="160"
-                  style="display:block; margin:0 auto;"
-                />
 
                 <!-- EN -->
                 <p style="margin:0 0 12px;">

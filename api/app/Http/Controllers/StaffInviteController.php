@@ -93,14 +93,11 @@ class StaffInviteController extends Controller
                 . '&email=' . urlencode($email)
                 . '&shop_code=' . urlencode($shop->code);
 
-            // Brand options for the new themed email (safe defaults if null)
             $options = [
                 'appName'     => config('app.name'),
-                'appSubtitle' => 'Virtual Pager',
-                'logoUrl'     => $shop->logo_url ? $shop->logo_url : (config('app.url') . '/placeholder-rounded.png'),
+                'appSubtitle' => config('app.fullname'),
                 'expireHours' => 72,
-                'supportEmail' => 'support@vipa-app.online',
-                //'footerNote'   => 'Sent by shop owner.',
+                'supportEmail' => config('app.support_email'),
             ];
 
             Mail::to($email)->send(new StaffInviteMail($acceptUrl, $shop->name, $shop->code, $options));
@@ -287,14 +284,11 @@ class StaffInviteController extends Controller
         $frontend = config('app.frontend_origin', 'http://localhost:5173');
         $acceptUrl = $frontend . '/staff-setup?token=' . urlencode($token) . '&email=' . urlencode($email) . '&shop_code=' . urlencode($shop->code);
 
-        // Brand options for the new themed email (safe defaults if null)
         $options = [
             'appName'     => config('app.name'),
-            'appSubtitle' => 'Virtual Pager',
-            'logoUrl'     => $shop->logo_url ? $shop->logo_url : (config('app.url') . '/placeholder-rounded.png'),
+            'appSubtitle' => config('app.fullname'),
             'expireHours' => 72,
-            'supportEmail' => 'support@vipa-app.online',
-            //'footerNote'   => 'Sent by shop owner.',
+            'supportEmail' => config('app.support_email'),
         ];
 
         Mail::to($email)->send(new StaffInviteMail($acceptUrl, $shop->name, $shop->code, $options));

@@ -17,10 +17,8 @@ class StaffInviteMail extends Mailable
   // Optional / themed variables
   public string $appName;
   public string $appSubtitle;
-  public string $logoUrl;
   public int $expireHours;
   public ?string $supportEmail;
-  public ?string $footerNote;
 
   /**
    * Create a new message instance.
@@ -37,11 +35,9 @@ class StaffInviteMail extends Mailable
 
     // Defaults (safe for all environments)
     $this->appName     = $options['appName']     ?? config('app.name');
-    $this->appSubtitle = $options['appSubtitle'] ?? 'Virtual Pager';
-    $this->logoUrl     = $options['logoUrl']     ?? (config('app.url') . '/app-icon.png');
+    $this->appSubtitle = $options['appSubtitle'] ?? config('app.fullname');
     $this->expireHours = $options['expireHours'] ?? 72;
-    $this->supportEmail = $options['supportEmail'] ?? null;
-    $this->footerNote   = $options['footerNote'] ?? null;
+    $this->supportEmail = $options['supportEmail'] ?? config('app.support_email');
   }
 
   /**
@@ -58,10 +54,8 @@ class StaffInviteMail extends Mailable
         'shopCode'    => $this->shopCode,
         'appName'     => $this->appName,
         'appSubtitle' => $this->appSubtitle,
-        'logoUrl'     => $this->logoUrl,
         'expireHours' => $this->expireHours,
         'supportEmail' => $this->supportEmail,
-        'footerNote'  => $this->footerNote,
       ]);
   }
 }

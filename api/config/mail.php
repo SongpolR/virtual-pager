@@ -115,4 +115,8 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'reply_to' => [
+        'address' => env('SUPPORT_EMAIL'),
+        'name' => env('SUPPORT_NAME', env('APP_NAME')),
+    ],
 ];

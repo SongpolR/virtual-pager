@@ -522,7 +522,7 @@ export default function Customer() {
               alt={shop.name}
               width={32}
               height={32}
-              className="relative h-10 w-10 rounded-full bg-indigo-600 ring-1 ring-slate-200 transition-transform duration-200 group-hover:scale-105 group-active:scale-95 dark:bg-indigo-500 dark:ring-slate-700"
+              className="relative h-10 w-10 rounded-full bg-white ring-1 ring-slate-200 transition-transform duration-200 group-hover:scale-105 group-active:scale-95 dark:ring-slate-700"
             />
           </div>
 

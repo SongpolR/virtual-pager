@@ -257,7 +257,7 @@ class OrderController extends Controller
         // Use GLOB instead of REGEXP for SQLite compatibility
         $max = Order::where('shop_id', $shopId)
             ->whereDate('order_date', $date)
-            ->whereRaw("order_no GLOB '[0-9][0-9][0-9]'")
+            ->whereRaw("order_no REGEXP '^[0-9]{3}$'")
             ->max('order_no');
 
         $next = $max ? ((int) $max + 1) : 1;

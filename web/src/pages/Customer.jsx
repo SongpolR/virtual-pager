@@ -270,7 +270,12 @@ export default function Customer() {
   useEffect(() => {
     if (!order?.id) return;
 
-    const socket = io(SOCKET_URL, { transports: ["websocket"] });
+    const socket = io(SOCKET_URL, {
+      path: import.meta.env.VITE_REALTIME_PATH || "/socket.io",
+      transports: ["websocket", "polling"], // allow fallback
+      withCredentials: true,
+    });
+
     socketRef.current = socket;
 
     socket.on("connect", () => {
@@ -288,11 +293,14 @@ export default function Customer() {
       setIsSocketConnected(false);
     });
 
+    socket.on("connect_error", (err) => {
+      // super helpful when debugging prod issues
+      console.log("socket connect_error:", err?.message, err);
+    });
+
     return () => {
-      try {
+      if (socket.connected) {
         socket.emit("leave_order_room", { order_id: order.id });
-      } catch {
-        // ignore
       }
       socket.disconnect();
       socketRef.current = null;
@@ -612,8 +620,8 @@ export default function Customer() {
                 {order.status === "ready"
                   ? t("status_hint.ready")
                   : order.status === "done"
-                  ? t("status_hint.done")
-                  : t("status_hint.default")}
+                    ? t("status_hint.done")
+                    : t("status_hint.default")}
               </div>
             </div>
           </div>

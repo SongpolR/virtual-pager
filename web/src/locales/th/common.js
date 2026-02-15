@@ -1,6 +1,6 @@
 const common = {
-  app_name: "วิภา",
-  full_app_name: "เพจเจอร์จำลอง",
+  app_name: "JustAMomentPlease",
+  full_app_name: "เพจเจอร์เรียกคิวออนไลน์",
   loading: "กำลังโหลด...",
   logout: "ออกจากระบบ",
   email: "อีเมล",

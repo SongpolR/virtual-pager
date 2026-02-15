@@ -19,7 +19,7 @@
               <td style="padding:24px;">
                 <div style="text-align:center;">
                   <div style="margin-top:2px; font-size:24px; font-weight:700; color:#4f46e5;">
-                    VIPA
+                    JustAMomentPlease
                   </div>
                   <!-- App name -->
                   <div style="font-size:14px; font-weight:500; color:#94a3b8; text-align:center;">

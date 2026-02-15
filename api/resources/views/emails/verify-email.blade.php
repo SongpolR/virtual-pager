@@ -18,10 +18,10 @@
           <tr>
             <td style="padding:24px; text-align:center;">
               <div style="margin-top:2px; font-size:24px; font-weight:700; color:#4f46e5;">
-                VIPA
+                JustAMomentPlease
               </div>
               <div style="margin-top:6px; font-size:14px; font-weight:500; color:#94a3b8;">
-                Virtual Pager
+                Online Queue Pager App
               </div>
             </td>
           </tr>

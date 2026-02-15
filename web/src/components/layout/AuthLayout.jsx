@@ -8,7 +8,6 @@ import { useTranslation } from "react-i18next";
 /**
  * AuthLayout
  * - Uses AppShell with optional glow + optional toolbar (Theme + Language)
- * - Optional app header row (icon + "ViPa · Virtual Pager")
  * - Optional card header (title + subtitle + optional right-side slot)
  * - Children are the form content (fields, errors, buttons, footer)
  */
@@ -41,7 +40,7 @@ export default function AuthLayout({
   return (
     <AppShell
       withGlow={withGlow}
-      toolbar={showToolbar ? toolbar ?? defaultToolbar : null}
+      toolbar={showToolbar ? (toolbar ?? defaultToolbar) : null}
       className={className}
       contentClassName={contentClassName}
     >
@@ -65,8 +64,11 @@ export default function AuthLayout({
 
             <div className="min-w-0">
               <h1 className="truncate text-base font-medium sm:text-lg text-slate-500 dark:text-slate-400">
-                <span>{t("app_name")}</span> — <span>{t("full_app_name")}</span>
+                <span>{t("app_name")}</span>
               </h1>
+              <p className="truncate text-xs font-medium text-slate-400">
+                <span>{t("full_app_name")}</span>
+              </p>
             </div>
           </div>
         )}

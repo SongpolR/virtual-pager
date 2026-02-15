@@ -245,7 +245,7 @@ export default function Customer() {
         if (!silent) setLoading(false);
       }
     },
-    [publicCode, t, showToast]
+    [publicCode, t, showToast],
   );
 
   useEffect(() => {
@@ -418,7 +418,7 @@ export default function Customer() {
               <div className="h-9 w-9 rounded-full bg-indigo-500/10 ring-1 ring-indigo-500/20 dark:bg-indigo-400/10 dark:ring-indigo-400/20" />
               <div className="min-w-0">
                 <div className="text-xs font-semibold text-slate-800 dark:text-slate-100">
-                  {t("shop") || "Virtual Pager"}
+                  {t("shop") || "JustAMomentPlease"}
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
                   {t("errors.title") || "Something went wrong"}
@@ -456,7 +456,7 @@ export default function Customer() {
               <div className="h-9 w-9 rounded-full bg-slate-500/10 ring-1 ring-slate-500/20 dark:bg-slate-400/10 dark:ring-slate-400/20" />
               <div className="min-w-0">
                 <div className="text-xs font-semibold text-slate-800 dark:text-slate-100">
-                  {t("shop") || "Virtual Pager"}
+                  {t("shop") || "JustAMomentPlease"}
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
                   {t("errors.order_not_found")}

@@ -4,7 +4,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Standardized API Error Codes (Virtual Pager)
+    | Standardized API Error Codes
     |--------------------------------------------------------------------------
     |
     | We use 4-digit numeric codes, grouped by leading digit:

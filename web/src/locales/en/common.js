@@ -1,7 +1,7 @@
 const common = {
   // General
-  app_name: "VIPA",
-  full_app_name: "Virtual Pager",
+  app_name: "JustAMomentPlease",
+  full_app_name: "Online Queue Pager App",
   loading: "Loading...",
   logout: "Logout",
   email: "Email",

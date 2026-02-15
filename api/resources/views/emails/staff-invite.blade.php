@@ -8,7 +8,7 @@
   <body style="margin:0; padding:0; background-color:#f1f5f9; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
     @php
       $appName = $appName ?? config('app.name');
-      $appSubtitle = $appSubtitle ?? 'Virtual Pager';
+      $appSubtitle = $appSubtitle ?? 'app.sub_name';
       $logoUrl = $logoUrl ?? (config('app.url') . '/app-icon.png');
       $expireHours = $expireHours ?? 72;
     @endphp
@@ -26,7 +26,7 @@
                 <div>
                   <!-- Logo -->
                   <div style="margin-top:2px; font-size:24px; font-weight:700; color:#4f46e5;">
-                    VIPA
+                    JustAMomentPlease
                   </div>
                   <!-- App name -->
                   <div style="font-size:14px; font-weight:500; color:#94a3b8; text-align:center;">

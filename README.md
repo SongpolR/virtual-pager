@@ -144,7 +144,7 @@ Open:
 ```
 VITE_API_BASE_URL=http://localhost:8000
 VITE_REALTIME_URL=http://localhost:4000
-VITE_APP_NAME="VIPA - Virtual Pager"
+VITE_APP_NAME="JustAMomentPlease"
 ```
 
 ### API (Laravel) example
@@ -152,7 +152,7 @@ VITE_APP_NAME="VIPA - Virtual Pager"
 `api/.env`
 
 ```
-APP_NAME="VIPA - Virtual Pager"
+APP_NAME="JustAMomentPlease"
 APP_ENV=local
 APP_KEY=base64:CHANGE_ME
 APP_URL=http://localhost:8000
@@ -160,7 +160,7 @@ APP_URL=http://localhost:8000
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=vipa
+DB_DATABASE=justamomentplease
 DB_USERNAME=root
 DB_PASSWORD=
 
@@ -172,7 +172,7 @@ MAIL_USERNAME=YOUR_BREVO_SMTP_LOGIN
 MAIL_PASSWORD=YOUR_BREVO_SMTP_KEY
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=no-reply@your-domain.com
-MAIL_FROM_NAME="VIPA"
+MAIL_FROM_NAME="JustAMomentPlease"
 ```
 
 ## Realtime (Node) example

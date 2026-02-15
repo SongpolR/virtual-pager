@@ -10,7 +10,7 @@ const app = express();
 /**
  * Allowed frontend origins (comma-separated in env)
  * Example:
- *   CORS_ORIGINS=https://vipa-app.online,https://www.vipa-app.online,http://localhost:5173
+ *   CORS_ORIGINS=https://justamomentplease.com,http://localhost:5173
  */
 const allowedOrigins = (process.env.CORS_ORIGINS || "")
   .split(",")
@@ -30,7 +30,7 @@ app.use(
     },
     methods: ["GET", "POST"],
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());

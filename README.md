@@ -1,6 +1,6 @@
-# VIPA - Virtual Pager
+# JustAMomentPlease - Online Queue Pager App
 
-VIPA (Virtual Pager) is a restaurant/café paging & order-notification platform built with:
+JustAMomentPlease is a restaurant/café paging & order-notification platform built with:
 
 - **Laravel** (REST API)
 - **React + Vite** (Web Admin / Staff UI)
